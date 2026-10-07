@@ -1,5 +1,4 @@
 // Photography page, in display order. `file` is the name in src/assets/photos/ (without .jpg).
-// Theme: perspective (lines converging to a vanishing point) and repetition (rows of similar forms).
 export type Photo = { file: string; caption: string };
 
 export const photos: Photo[] = [
@@ -9,16 +8,23 @@ export const photos: Photo[] = [
   { file: 'daruma', caption: 'Daruma at Katsuō-ji, Minoh' },
   { file: 'california-street', caption: 'California Street, San Francisco' },
   { file: 'torii', caption: 'Karakuni Shrine, Osaka' },
-  { file: 'bonsai', caption: 'Bonsai' },
-  { file: 'canal', caption: 'Canal, Japan' },
+  { file: 'bonsai', caption: 'Bonsai, Toronto' },
+  { file: 'canal', caption: 'Canal, Kawaguchiko, Japan' },
+  { file: 'yonge-dundas', caption: 'Yonge–Dundas Square, Toronto' },
   { file: 'little-italy', caption: 'Little Italy, New York' },
+  { file: 'lanterns', caption: 'Temple lanterns, Korea' },
   { file: 'painted-ladies', caption: 'The Painted Ladies, San Francisco' },
-  { file: 'rice-field', caption: 'Rice field, Japan' },
+  { file: 'rice-field', caption: 'Rice field, Kawaguchiko, Japan' },
   { file: 'shinsekai', caption: 'Shinsekai, Osaka' },
+  { file: 'otogicco', caption: 'Otogicco figurines, Japan' },
   { file: 'cathedral', caption: 'St. Paul Cathedral, Pittsburgh' },
   { file: 'stream', caption: 'Mountain stream, Japan' },
+  { file: 'yonge-street-crowd', caption: 'Open street, Toronto' },
   { file: 'cable-car', caption: 'Cable car, San Francisco' },
+  { file: 'snow', caption: 'Snow day, California' },
   { file: 'niagara', caption: 'Niagara Gorge' },
+  { file: 'subs', caption: 'Lunch' },
   { file: 'malibu', caption: 'Malibu' },
+  { file: 'malibu-coast', caption: 'Malibu coastline' },
   { file: 'los-angeles', caption: 'Downtown Los Angeles at night' },
 ];

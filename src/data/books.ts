@@ -48,7 +48,7 @@ export const shelves: Shelf[] = [
   {
     subject: 'Engineering',
     books: [
-      { title: 'Circuit Analysis and Design', authors: 'Fawwaz T. Ulaby, Michel M. Maharbiz & Cynthia M. Furse', edition: '3rd ed.', year: 2025, pages: 779 },
+      { title: 'Circuit Analysis and Design', authors: 'Fawwaz T. Ulaby, Michel M. Maharbiz & Cynthia M. Furse', edition: '3rd ed.', year: 2025, pages: 779, note: 'Free from the University of Michigan’s ECE textbook initiative.', href: 'https://cad.eecs.umich.edu/' },
       { title: 'Propulsion and Power', subtitle: 'An Exploration of Gas Turbine Performance Modeling', authors: 'Joachim Kurzke & Ian Halliwell', year: 2018, pages: 766 },
       { title: 'Engineering Graphics Essentials', authors: 'Kirstie Plantenberg', edition: '5th ed.', year: 2016, pages: 627 },
     ],

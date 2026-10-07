@@ -16,8 +16,9 @@ const items = photos.map((p) => {
 <Base title="Photography" description="Photographs by Payton Suh: perspective and repetition.">
   <h1>Photography</h1>
   <p class="muted">
-    Lines that converge and forms that repeat: streets, rails, and paths running
-    to a vanishing point, and rows of stones, lanterns, and daruma.
+    Lines that converge and forms that repeat, and the places in between:
+    Toronto, Kyoto, Osaka, Kawaguchiko, San Francisco, New York, and home in
+    Los Angeles.
   </p>
 
   <MathFigure kind="perspective" caption="Parallel lines meet at a point at infinity: the projective plane, on the ground." height={130} />
@@ -35,10 +36,7 @@ const items = photos.map((p) => {
               loading={i < 6 ? 'eager' : 'lazy'}
             />
           </a>
-          <figcaption>
-            <span class="no">{String(i + 1).padStart(2, '0')}</span>
-            {p.caption}
-          </figcaption>
+          <figcaption>{p.caption}</figcaption>
         </figure>
       ))
     }
@@ -103,10 +101,16 @@ const items = photos.map((p) => {
     margin: 0 0 1.75rem;
   }
   figure a {
+    /* small passe-partout frame */
     display: block;
     overflow: hidden;
-    border-radius: 2px;
-    background: var(--code-bg);
+    padding: 5px;
+    border: 1px solid var(--rule);
+    background: var(--bg);
+    transition: border-color 0.3s;
+  }
+  figure a:hover {
+    border-color: var(--accent);
   }
   figure img {
     display: block;
@@ -130,15 +134,6 @@ const items = photos.map((p) => {
     font-size: 0.85rem;
     font-style: italic;
     color: var(--muted);
-  }
-  .no {
-    font-style: normal;
-    font-variant-numeric: lining-nums tabular-nums;
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
-    color: var(--accent);
-    border-top: 1px solid var(--accent);
-    padding-top: 0.1rem;
   }
 
   .lightbox {
@@ -177,6 +172,7 @@ const items = photos.map((p) => {
     padding: 2.5rem 0;
   }
   .lightbox img {
+    padding: 0;
     max-width: 100%;
     max-height: calc(100vh - 7rem);
     width: auto;

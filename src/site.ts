@@ -8,10 +8,12 @@ export const site = {
   email: 'paytonsuh@ucla.edu',
   github: 'https://github.com/verysillytuna',
   linkedin: 'https://www.linkedin.com/in/paytonsuh/',
+  instagram: 'https://www.instagram.com/suh.payton/',
 };
 
 export const nav = [
   { href: '/', label: 'About' },
+  { href: '/education/', label: 'Education' },
   { href: '/research/', label: 'Research' },
   { href: '/notes/', label: 'Notes' },
   { href: '/books/', label: 'Books' },

@@ -1,0 +1,167 @@
+---
+import Base from '../layouts/Base.astro';
+import MathFigure from '../components/MathFigure.astro';
+import { schools } from '../data/education';
+---
+
+<Base title="Education" description="Payton Suh’s education: UCLA, Santa Monica College, and The Science Academy STEM Magnet.">
+  <h1>Education</h1>
+  <p class="muted">High school diploma at sixteen, two years at Santa Monica College, and now mathematics at UCLA.</p>
+
+  <MathFigure kind="perspective" caption="Every path converges somewhere." height={110} />
+
+  <ol class="timeline">
+    {
+      schools.map((s, i) => (
+        <li class:list={{ current: i === 0 }}>
+          <header>
+            <h2>{s.name}</h2>
+            <p class="period">{s.period}</p>
+          </header>
+          <p class="credential">{s.credential}</p>
+          {s.details && s.details.map((d) => <p class="detail">{d}</p>)}
+
+          {s.activities && (
+            <>
+              <h3>Activities &amp; honors</h3>
+              <ul class="activities">
+                {s.activities.map((a) => (
+                  <li>{a}</li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {s.coursework && (
+            <>
+              <h3>{s.courseworkLabel}</h3>
+              <div class="groups">
+                {s.coursework.map((g) => (
+                  <section class="group">
+                    <p class="subject">{g.subject}</p>
+                    <ul>
+                      {g.courses.map((c) => (
+                        <li>
+                          {c.code && <span class="code">{c.code}</span>}
+                          <span class="cname">{c.name}</span>
+                          {c.note && <span class="note">{c.note}</span>}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+            </>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</Base>
+
+<style>
+  .timeline {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0 0 0 1.5rem;
+    border-left: 1px solid var(--rule);
+  }
+  .timeline > li {
+    position: relative;
+    padding-bottom: 2.5rem;
+  }
+  .timeline > li::before {
+    content: '';
+    position: absolute;
+    left: calc(-1.5rem - 6px);
+    top: 0.65rem;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--accent);
+  }
+  .timeline > li.current::before {
+    background: var(--accent);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0 1rem;
+  }
+  h2 {
+    margin: 0;
+    font-variant: normal;
+    letter-spacing: 0;
+    font-size: 1.35rem;
+  }
+  .period {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-variant-numeric: lining-nums;
+  }
+  .credential {
+    margin: 0.1rem 0 0.4rem;
+    font-style: italic;
+  }
+  .detail {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  h3 {
+    margin: 1.1rem 0 0.4rem;
+    font-size: 0.8rem;
+    font-style: normal;
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+  .activities {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+  .activities li {
+    margin-bottom: 0.15rem;
+  }
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 0.9rem 1.5rem;
+  }
+  .subject {
+    margin: 0 0 0.2rem;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 0.1rem;
+  }
+  .group ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .group li {
+    font-size: 0.92rem;
+    line-height: 1.4;
+    margin: 0.2rem 0;
+  }
+  .code {
+    display: inline-block;
+    min-width: 5.6rem;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+  .note {
+    display: block;
+    margin-left: 5.6rem;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--muted);
+  }
+</style>

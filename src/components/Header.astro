@@ -7,7 +7,11 @@ const isActive = (href: string) =>
 ---
 
 <header>
-  <a class="name" href="/"><span class="mark" aria-hidden="true">φ</span>{site.name}</a>
+  <a class="name" href="/"><span class="mark" aria-hidden="true"
+    ><svg viewBox="0 0 64 64"
+      ><path d="M32 9.5v45" /><ellipse cx="32" cy="32" rx="15" ry="11.5" /></svg
+    ></span
+  >{site.name}</a>
   <nav aria-label="Main">
     {
       nav.map((item) => (
@@ -55,13 +59,16 @@ const isActive = (href: string) =>
     margin-right: 0.55rem;
     border-radius: 5px;
     background: var(--accent);
-    color: var(--bg);
-    font-style: italic;
-    font-variant: normal;
-    font-size: 1.05rem;
-    letter-spacing: 0;
-    vertical-align: 0.05em;
+    vertical-align: -0.3em;
     transition: transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .mark svg {
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: var(--bg);
+    stroke-width: 4.2;
+    stroke-linecap: round;
   }
   .name:hover .mark {
     transform: rotate(-8deg) scale(1.06);

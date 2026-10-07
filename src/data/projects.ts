@@ -45,4 +45,12 @@ export const projects: Project[] = [
     description:
       'Python and machine-learning pipeline to extract, decompose, and analyze stellar light curves from public survey data and flag anomalous emission. Co-authored a research submission reporting a previously unreported variable star with frequent high-energy flares.',
   },
+  {
+    title: 'Comparing Solar Activity Across Satellites',
+    area: 'Space Physics · Python',
+    status: 'completed',
+    period: 'Fall 2025',
+    description:
+      'Class project for Physics 23 at Santa Monica College: a Python program that pulls solar-activity measurements from two different satellites’ public archives and compares them on a common timeline.',
+  },
 ];

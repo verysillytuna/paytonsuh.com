@@ -3,6 +3,7 @@ import Base from '../../layouts/Base.astro';
 import MathFigure from '../../components/MathFigure.astro';
 import { projects } from '../../data/projects';
 import { recommendation } from '../../data/recommendation';
+import { service } from '../../data/service';
 
 const order = { ongoing: 0, planned: 1, completed: 2 } as const;
 const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
@@ -56,6 +57,20 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
     ))
   }
 
+  <h2>Teaching &amp; service</h2>
+  <ul class="service">
+    {
+      service.map((x) => (
+        <li>
+          <p>
+            <strong>{x.title}</strong>, {x.org} <span class="muted">· {x.period}</span>
+          </p>
+          <p>{x.text}</p>
+        </li>
+      ))
+    }
+  </ul>
+
   <h2>From a recommendation</h2>
   <figure class="rec">
     {recommendation.quotes.map((q) => <blockquote>“{q}”</blockquote>)}
@@ -102,6 +117,17 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
     margin: 0 0 0.2rem;
   }
   .rec {
+    margin: 0;
+  }
+  .service {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .service li {
+    margin-bottom: 1rem;
+  }
+  .service p {
     margin: 0;
   }
   .rec blockquote {
