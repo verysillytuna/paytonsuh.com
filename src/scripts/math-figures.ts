@@ -912,7 +912,135 @@ const martingale: Factory = () => {
   };
 };
 
+// A linear map acting on the plane: grid, basis vectors, unit square → parallelogram, and the eigenvector lines.
+const linmap: Factory = () => {
+  const mats = [
+    [2, 1, 0.5, 1.5],   // eigenvalues 2.5 and 1
+    [1, 0.8, 0, 1],     // shear: one eigendirection
+    [1.6, 0, 0, 0.6],   // diagonal stretch
+    [0.9, -1.2, 0.8, 0.9], // rotation-scaling: no real eigenvectors
+  ];
+  let t = 0, k = 0;
+  return (ctx, w, h, c) => {
+    t += 0.008;
+    // ease in, hold, ease out, then move to the next matrix
+    const phase = t % 4;
+    if (t > 4 * (k + 1)) k++;
+    const M = mats[k % mats.length];
+    const e = phase < 1.5 ? (s => s * s * (3 - 2 * s))(Math.min(1, phase / 1.5)) : phase < 3 ? 1 : (s => 1 - s * s * (3 - 2 * s))((phase - 3));
+    const a = 1 + (M[0] - 1) * e, b = M[1] * e, cc = M[2] * e, d = 1 + (M[3] - 1) * e;
+    const u = Math.min(w, h * 1.6) / 9;
+    const X = (x: number, y: number) => [w / 2 + (a * x + b * y) * u, h / 2 - (cc * x + d * y) * u];
+    // background grid (fixed) and transformed grid
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = withAlpha(c.muted, 0.12);
+    for (let i = -8; i <= 8; i++) {
+      ctx.beginPath(); ctx.moveTo(w / 2 + i * u, 0); ctx.lineTo(w / 2 + i * u, h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, h / 2 + i * u); ctx.lineTo(w, h / 2 + i * u); ctx.stroke();
+    }
+    ctx.strokeStyle = withAlpha(c.accent2, 0.35);
+    for (let i = -8; i <= 8; i++) {
+      let p = X(i, -8), q = X(i, 8);
+      ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+      p = X(-8, i); q = X(8, i);
+      ctx.beginPath(); ctx.moveTo(p[0], p[1]); ctx.lineTo(q[0], q[1]); ctx.stroke();
+    }
+    // unit square → parallelogram, area = det
+    const sq = [X(0, 0), X(1, 0), X(1, 1), X(0, 1)];
+    ctx.fillStyle = withAlpha(c.earth, 0.22);
+    ctx.beginPath();
+    sq.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.closePath();
+    ctx.fill();
+    // eigenvector lines of the current (interpolated) matrix
+    const tr = a + d, det = a * d - b * cc, disc = tr * tr - 4 * det;
+    if (disc >= 0) {
+      for (const lam of [(tr + Math.sqrt(disc)) / 2, (tr - Math.sqrt(disc)) / 2]) {
+        let vx = b, vy = lam - a;
+        if (Math.hypot(vx, vy) < 1e-6) [vx, vy] = [lam - d, cc];
+        if (Math.hypot(vx, vy) < 1e-6) [vx, vy] = [1, 0];
+        const n = Math.hypot(vx, vy) / 12;
+        ctx.strokeStyle = withAlpha(c.accent, 0.55);
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(w / 2 - (vx / n) * u, h / 2 + (vy / n) * u);
+        ctx.lineTo(w / 2 + (vx / n) * u, h / 2 - (vy / n) * u);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    }
+    // basis vectors
+    const arrow = (x: number, y: number, color: string) => {
+      const [x0, y0] = X(0, 0), [x1, y1] = X(x, y), ang = Math.atan2(y1 - y0, x1 - x0);
+      ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x1 - 8 * Math.cos(ang - 0.4), y1 - 8 * Math.sin(ang - 0.4));
+      ctx.lineTo(x1 - 8 * Math.cos(ang + 0.4), y1 - 8 * Math.sin(ang + 0.4));
+      ctx.fill();
+    };
+    arrow(1, 0, c.accent);
+    arrow(0, 1, c.accent2);
+    ctx.fillStyle = c.fg;
+    ctx.font = 'italic 13px "EB Garamond", serif';
+    ctx.fillText(`A = [${M[0]} ${M[1]}; ${M[2]} ${M[3]}]`, 8, 16);
+    ctx.fillStyle = c.muted;
+    ctx.fillText(`det = ${det.toFixed(2)}`, 8, 32);
+  };
+};
+
+// Singular value decomposition A = UΣVᵀ: rotate, stretch along the axes, rotate again.
+const svd: Factory = () => {
+  // A = U Σ Vᵀ with U = R(α), Σ = diag(s1, s2), V = R(β)
+  const alpha = 0.6, beta = -0.9, s1 = 1.8, s2 = 0.6;
+  let t = 0;
+  return (ctx, w, h, c) => {
+    t += 0.006;
+    const cycle = t % 4; // 0–1 Vᵀ, 1–2 Σ, 2–3 U, 3–4 hold then reset
+    const sm = (x: number) => { const s = Math.min(1, Math.max(0, x)); return s * s * (3 - 2 * s); };
+    const p1 = sm(cycle), p2 = sm(cycle - 1), p3 = sm(cycle - 2);
+    const fade = cycle > 3.6 ? 1 - (cycle - 3.6) / 0.4 : 1;
+    const rot = (x: number, y: number, th: number) => [x * Math.cos(th) - y * Math.sin(th), x * Math.sin(th) + y * Math.cos(th)];
+    const apply = (x: number, y: number) => {
+      [x, y] = rot(x, y, -beta * p1);                  // Vᵀ
+      [x, y] = [x * (1 + (s1 - 1) * p2), y * (1 + (s2 - 1) * p2)]; // Σ
+      return rot(x, y, alpha * p3);                     // U
+    };
+    const R = h * 0.26, cx = w / 2, cy = h / 2;
+    ctx.strokeStyle = withAlpha(c.muted, 0.25);
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cx - w / 2, cy); ctx.lineTo(cx + w / 2, cy); ctx.moveTo(cx, 0); ctx.lineTo(cx, h); ctx.stroke();
+    // image of the unit circle
+    ctx.fillStyle = withAlpha(c.accent2, 0.12 * fade);
+    ctx.strokeStyle = withAlpha(c.accent2, 0.9 * fade);
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    for (let i = 0; i <= 120; i++) {
+      const th = (i / 120) * TAU, [x, y] = apply(Math.cos(th), Math.sin(th));
+      i ? ctx.lineTo(cx + x * R, cy - y * R) : ctx.moveTo(cx + x * R, cy - y * R);
+    }
+    ctx.fill(); ctx.stroke();
+    // right singular vectors v1, v2 carried along: they end up as s1·u1, s2·u2
+    for (const [k, color] of [[0, c.accent], [1, c.earth]] as const) {
+      const v = rot(k === 0 ? 1 : 0, k === 0 ? 0 : 1, beta);
+      const [x, y] = apply(v[0], v[1]);
+      ctx.strokeStyle = withAlpha(color, fade);
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + x * R, cy - y * R); ctx.stroke();
+      ctx.fillStyle = withAlpha(color, fade);
+      ctx.beginPath(); ctx.arc(cx + x * R, cy - y * R, 3, 0, TAU); ctx.fill();
+    }
+    const label = cycle < 1 ? 'Vᵀ: rotate' : cycle < 2 ? 'Σ: stretch by σ₁, σ₂' : cycle < 3 ? 'U: rotate' : 'A = UΣVᵀ';
+    ctx.fillStyle = c.fg;
+    ctx.font = 'italic 13px "EB Garamond", serif';
+    ctx.fillText(label, 8, 16);
+  };
+};
+
 const factories: Record<string, Factory> = {
+  linmap, svd,
   hairyball, conesphere, montecarlo, martingale,
   lorenz, brownian, fourier, torus, perspective, lattice, conformal, flow, mobius, hopf, gbm, qv,
 };

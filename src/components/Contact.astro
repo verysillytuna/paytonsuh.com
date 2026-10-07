@@ -52,7 +52,16 @@ const handle = site.linkedin.replace(/\/$/, '').split('/').pop();
   .contact a:hover span {
     border-color: var(--accent);
   }
-  .contact :global(.icon) {
+  .contact li:nth-child(1) :global(.icon) {
     color: var(--accent);
+  }
+  .contact li:nth-child(2) :global(.icon) {
+    color: var(--earth);
+  }
+  .contact li:nth-child(3) :global(.icon) {
+    color: var(--accent-2);
+  }
+  .contact li:nth-child(4) :global(.icon) {
+    color: var(--plum);
   }
 </style>

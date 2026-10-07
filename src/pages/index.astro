@@ -59,24 +59,49 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     times a week (8-ball and 9-ball), and cook.
   </p>
 
-  <MathFigure
-    kind="lorenz"
-    caption="The Lorenz attractor: two trajectories starting 10<sup>−5</sup> apart, burgundy and blue, eventually part ways."
-    height={200}
-  />
 
   <h2>Things I think about</h2>
   <div class="figures">
-    <div class="feature">
+    <div class="card feature denim">
       <MathFigure kind="gbm" caption="<b>Brownian motion.</b> Geometric Brownian motion d<i>S</i> = μ<i>S</i> d<i>t</i> + σ<i>S</i> d<i>W</i>; terminal values pile up into a lognormal law." height={190} />
     </div>
-    <MathFigure kind="hairyball" caption="<b>Hairy ball theorem.</b> Every continuous tangent vector field on <i>S</i><sup>2</sup> vanishes somewhere: you cannot comb a hairy ball flat." height={180} />
-    <MathFigure kind="conesphere" caption="<b>A cone is a sphere.</b> Round the apex and inflate: the closed cone is homeomorphic to <i>S</i><sup>2</sup>. Topology forgets corners." height={180} />
-    <MathFigure kind="montecarlo" caption="<b>Monte Carlo.</b> The fraction of random points landing in the quarter disc estimates π/4, with error shrinking like 1/√<i>n</i>." height={180} />
-    <MathFigure kind="martingale" caption="<b>The martingale bet.</b> Double the stake after every loss. Most gamblers (blue) creep upward, a few (brown) are wiped out, and the average (burgundy) stays at the starting bankroll, as optional stopping demands." height={180} />
+    <div class="card sand">
+      <MathFigure kind="linmap" caption="<b>Linear maps.</b> A matrix moves the whole grid at once; dashed lines are its eigenvectors, which only stretch, and the shaded square’s area becomes det <i>A</i>." height={200} />
+    </div>
+    <div class="card rose">
+      <MathFigure kind="svd" caption="<b>Singular value decomposition.</b> Every matrix is a rotation, a stretch along perpendicular axes, and another rotation: <i>A</i> = <i>U</i>Σ<i>V</i><sup>T</sup>." height={200} />
+    </div>
+    <div class="card rose">
+      <MathFigure kind="hairyball" caption="<b>Hairy ball theorem.</b> Every continuous tangent vector field on <i>S</i><sup>2</sup> vanishes somewhere: you cannot comb a hairy ball flat." height={180} />
+    </div>
+    <div class="card denim">
+      <MathFigure kind="conesphere" caption="<b>A cone is a sphere.</b> Round the apex and inflate: the closed cone is homeomorphic to <i>S</i><sup>2</sup>. Topology forgets corners." height={180} />
+    </div>
+    <div class="card sand">
+      <MathFigure kind="montecarlo" caption="<b>Monte Carlo.</b> The fraction of random points landing in the quarter disc estimates π/4, with error shrinking like 1/√<i>n</i>." height={180} />
+    </div>
+    <div class="card rose">
+      <MathFigure kind="martingale" caption="<b>The martingale bet.</b> Double the stake after every loss. Most gamblers (blue) creep upward, a few (brown) are wiped out, and the average (burgundy) stays at the starting bankroll, as optional stopping demands." height={180} />
+    </div>
   </div>
 
   <h2>Currently</h2>
+  <div class="now">
+    <section class="now-card rose">
+      <p class="now-label">Competition</p>
+      <p>Preparing for the William Lowell Putnam Mathematical Competition.</p>
+    </section>
+    <section class="now-card denim">
+      <p class="now-label">Research</p>
+      <p>Machine-learning research, alongside leading simulation for <a href="/research/zrc-arc/">ZrC-ARC</a>.</p>
+    </section>
+    <section class="now-card sand">
+      <p class="now-label">Building</p>
+      <p>Personal projects in code and mathematics.</p>
+    </section>
+  </div>
+
+  <h3>Courses</h3>
   <ul>
     <li>Math 110AH: Algebra (Honors)</li>
     <li>Math 115AH: Linear Algebra (Honors)</li>
@@ -86,7 +111,6 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     Planned: abstract algebra, analysis, complex analysis, geometric analysis,
     topology, probability theory, and stochastic calculus.
   </p>
-  <p>Preparing for the William Lowell Putnam Mathematical Competition.</p>
 
   <h3>Reading</h3>
   <ul>
@@ -144,9 +168,53 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     pointer-events: none;
   }
   .figures {
+    --w: min(52rem, calc(100vw - 2rem));
+    width: var(--w);
+    margin-left: calc((100% - var(--w)) / 2);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    gap: 0.5rem 1.75rem;
+    gap: 1rem;
+  }
+  .card {
+    padding: 1rem 1rem 0.25rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+  }
+  .card :global(.math-figure) {
+    margin-bottom: 0.75rem;
+  }
+  .rose {
+    background: var(--tint-rose);
+    border-top: 2px solid var(--accent);
+  }
+  .denim {
+    background: var(--tint-denim);
+    border-top: 2px solid var(--accent-2);
+  }
+  .sand {
+    background: var(--tint-sand);
+    border-top: 2px solid var(--earth);
+  }
+  .now {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: 0.75rem;
+  }
+  .now-card {
+    padding: 0.75rem 0.9rem;
+    border-radius: 3px;
+  }
+  .now-card p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  .now-label {
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    font-size: 0.8rem !important;
+    color: var(--muted);
+    margin-bottom: 0.25rem !important;
   }
   .feature {
     grid-column: 1 / -1;

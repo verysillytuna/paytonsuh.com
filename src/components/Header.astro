@@ -1,5 +1,6 @@
 ---
 import { nav, site } from '../site';
+import phi from './phi-path.txt?raw';
 
 const path = Astro.url.pathname;
 const isActive = (href: string) =>
@@ -7,11 +8,7 @@ const isActive = (href: string) =>
 ---
 
 <header>
-  <a class="name" href="/"><span class="mark" aria-hidden="true"
-    ><svg viewBox="0 0 64 64"
-      ><path d="M32 9.5v45" /><ellipse cx="32" cy="32" rx="15" ry="11.5" /></svg
-    ></span
-  >{site.name}</a>
+  <a class="name" href="/"><span class="mark" aria-hidden="true"><svg viewBox="0 0 64 64"><path d={phi} /></svg></span>{site.name}</a>
   <nav aria-label="Main">
     {
       nav.map((item) => (
@@ -65,10 +62,7 @@ const isActive = (href: string) =>
   .mark svg {
     width: 100%;
     height: 100%;
-    fill: none;
-    stroke: var(--bg);
-    stroke-width: 4.2;
-    stroke-linecap: round;
+    fill: var(--bg);
   }
   .name:hover .mark {
     transform: rotate(-8deg) scale(1.06);
