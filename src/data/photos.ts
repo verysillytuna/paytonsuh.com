@@ -6,7 +6,7 @@ export const photos: Photo[] = [
   { file: 'yonge-street', caption: 'Yonge Street, Toronto' },
   { file: 'adashino', caption: 'Adashino Nenbutsu-ji, Kyoto' },
   { file: 'platform', caption: 'Station platform, Japan' },
-  { file: 'daruma', caption: 'Daruma, Osaka' },
+  { file: 'daruma', caption: 'Daruma at Katsuō-ji, Minoh' },
   { file: 'california-street', caption: 'California Street, San Francisco' },
   { file: 'torii', caption: 'Karakuni Shrine, Osaka' },
   { file: 'bonsai', caption: 'Bonsai' },
