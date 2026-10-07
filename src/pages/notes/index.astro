@@ -1,0 +1,41 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<Base title="Notes" description="Mathematical notes and expository writing.">
+  <h1>Notes</h1>
+  <p class="muted">Expository notes, problem write-ups, and things I am learning.</p>
+
+  <ul>
+    {
+      notes.map((n) => (
+        <li>
+          <a href={`/notes/${n.id}/`}>{n.data.title}</a>
+          <span class="muted">
+            {' '}
+            · {n.data.date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' })}
+          </span>
+          <p class="summary">{n.data.summary}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    margin: 1.25rem 0;
+  }
+  .summary {
+    margin: 0.15rem 0 0;
+  }
+</style>

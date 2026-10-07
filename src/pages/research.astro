@@ -1,0 +1,50 @@
+---
+import Base from '../layouts/Base.astro';
+import { projects } from '../data/projects';
+
+const order = { ongoing: 0, planned: 1, completed: 2 } as const;
+const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
+---
+
+<Base title="Research" description="Research, projects, and directed reading.">
+  <h1>Research &amp; Projects</h1>
+  <p class="muted">
+    Mathematics, computer science, and the physical sciences — ongoing work,
+    directed reading, and completed projects.
+  </p>
+
+  {
+    sorted.map((p) => (
+      <article>
+        <h3>{p.title}</h3>
+        <p class="meta muted">
+          <span class="smallcaps">{p.area}</span> · {p.period} · {p.status}
+        </p>
+        <p>{p.description}</p>
+        {p.links && (
+          <p class="links">
+            {p.links.map((l, i) => (
+              <>
+                {i > 0 && ' · '}
+                <a href={l.href}>{l.label}</a>
+              </>
+            ))}
+          </p>
+        )}
+      </article>
+    ))
+  }
+</Base>
+
+<style>
+  article {
+    margin: 1.75rem 0;
+  }
+  article h3 {
+    margin-bottom: 0.15rem;
+  }
+  .meta {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+  }
+</style>

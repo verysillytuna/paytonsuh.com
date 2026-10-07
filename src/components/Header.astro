@@ -1,0 +1,54 @@
+---
+import { nav, site } from '../site';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? path === '/' : path.startsWith(href);
+---
+
+<header>
+  <a class="name" href="/">{site.name}</a>
+  <nav aria-label="Main">
+    {
+      nav.map((item) => (
+        <a href={item.href} aria-current={isActive(item.href) ? 'page' : undefined}>
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+</header>
+
+<style>
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    padding: 2rem 0 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .name {
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+  }
+  nav {
+    display: flex;
+    gap: 1.1rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    font-variant: small-caps;
+    letter-spacing: 0.05em;
+  }
+  nav a:hover,
+  nav a[aria-current='page'] {
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="CV" description="Curriculum vitae.">
+  <h1>Curriculum Vitae</h1>
+  <!-- TODO: drop a PDF at public/cv.pdf and uncomment:
+  <p><a href="/cv.pdf">Download PDF</a></p> -->
+
+  <h2>Education</h2>
+  <dl>
+    <dt>University of California, Los Angeles</dt>
+    <dd>
+      B.S. Mathematics, expected TODO<br />
+      <span class="muted">Departmental Scholars Program (B.S./M.A.), intended</span>
+    </dd>
+  </dl>
+
+  <h2>Coursework</h2>
+  <dl>
+    <dt>In progress</dt>
+    <dd>
+      Algebra (Math 110AH), Linear Algebra (Math 115AH), Analysis (Math 131AH),
+      all honors
+    </dd>
+    <dt>Planned</dt>
+    <dd>Topology, Probability Theory, Stochastic Calculus</dd>
+  </dl>
+
+  <h2>Research &amp; Projects</h2>
+  <p>See <a href="/research/">Research</a>.</p>
+
+  <h2>Honors &amp; Awards</h2>
+  <p class="muted">TODO</p>
+
+  <h2>Skills</h2>
+  <p class="muted">TODO: e.g. Python, C++, LaTeX, Lean</p>
+</Base>
+
+<style>
+  dl {
+    margin: 0;
+  }
+  dt {
+    font-weight: 600;
+    margin-top: 0.75rem;
+  }
+  dd {
+    margin: 0.1rem 0 0 1.25rem;
+  }
+</style>
