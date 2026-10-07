@@ -1,23 +1,23 @@
 :root {
   /* Palette drawn from a wardrobe: off-white cotton, raw indigo denim, washed denim,
-     grey denim, burgundy, and brown leather. */
+     plum, burgundy, brown leather, and sand. Tuned soft so accents sit gently on the paper. */
   --bg: #f6f4ef;
-  --fg: #1e2230;
-  --muted: #5e6573;
-  --rule: #d8d5cc;
-  --accent: #6e2a3a;
-  --accent-hover: #8c3a4c;
-  --accent-2: #4b6585;
-  --earth: #7b5a45;
-  --plum: #563046;
-  --denim-light: #8fa9c6;
-  --sand: #d8cdb8;
-  --ink: #1e2230;
-  --on-ink: #ece8df;
-  --tint-rose: #f3ebe9;
-  --tint-denim: #ebeff3;
-  --tint-sand: #f0ebe1;
-  --code-bg: #ebe8e1;
+  --fg: #2a2e3a;
+  --muted: #676c77;
+  --rule: #e3dfd6;
+  --accent: #8a4555;
+  --accent-hover: #a35a6b;
+  --accent-2: #58708d;
+  --earth: #84674f;
+  --plum: #79546a;
+  --denim-light: #b3c3d6;
+  --sand: #dcd3c2;
+  --ink: #343a4a;
+  --on-ink: #eeeae2;
+  --tint-rose: #f4eeeb;
+  --tint-denim: #eff1f2;
+  --tint-sand: #f2eee6;
+  --code-bg: #eeebe4;
   --measure: 40rem;
   --serif: 'EB Garamond', 'Garamond', 'Georgia', serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -27,44 +27,44 @@
 /* Dark palette: follows the system unless the toggle has picked a theme. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #161920;
-    --fg: #e8e5de;
-    --muted: #9ba2ae;
-    --rule: #2e333e;
-    --accent: #c98b98;
-    --accent-hover: #dea7b2;
-    --accent-2: #8ea8c7;
-    --earth: #b8937a;
-    --plum: #b98aa4;
-    --denim-light: #6f8aab;
-    --sand: #3b362e;
-    --ink: #0f1116;
-    --on-ink: #d9d5cc;
-    --tint-rose: #21191e;
-    --tint-denim: #19202a;
-    --tint-sand: #1f1d1a;
-    --code-bg: #1f232c;
+    --bg: #181b22;
+    --fg: #e4e1da;
+    --muted: #a0a6b1;
+    --rule: #2c303a;
+    --accent: #cf9aa5;
+    --accent-hover: #e0b4bd;
+    --accent-2: #9db2cc;
+    --earth: #c2a28b;
+    --plum: #c3a0b4;
+    --denim-light: #5c7491;
+    --sand: #3a352e;
+    --ink: #12141a;
+    --on-ink: #d8d4cb;
+    --tint-rose: #201c20;
+    --tint-denim: #1b2029;
+    --tint-sand: #1f1e1b;
+    --code-bg: #20242c;
     color-scheme: dark;
   }
 }
 :root[data-theme='dark'] {
-  --bg: #161920;
-  --fg: #e8e5de;
-  --muted: #9ba2ae;
-  --rule: #2e333e;
-  --accent: #c98b98;
-  --accent-hover: #dea7b2;
-  --accent-2: #8ea8c7;
-  --earth: #b8937a;
-  --plum: #b98aa4;
-  --denim-light: #6f8aab;
-  --sand: #3b362e;
-  --ink: #0f1116;
-  --on-ink: #d9d5cc;
-  --tint-rose: #21191e;
-  --tint-denim: #19202a;
-  --tint-sand: #1f1d1a;
-  --code-bg: #1f232c;
+  --bg: #181b22;
+  --fg: #e4e1da;
+  --muted: #a0a6b1;
+  --rule: #2c303a;
+  --accent: #cf9aa5;
+  --accent-hover: #e0b4bd;
+  --accent-2: #9db2cc;
+  --earth: #c2a28b;
+  --plum: #c3a0b4;
+  --denim-light: #5c7491;
+  --sand: #3a352e;
+  --ink: #12141a;
+  --on-ink: #d8d4cb;
+  --tint-rose: #201c20;
+  --tint-denim: #1b2029;
+  --tint-sand: #1f1e1b;
+  --code-bg: #20242c;
   color-scheme: dark;
 }
 
@@ -191,7 +191,7 @@ pre code {
 blockquote {
   margin: 1rem 0;
   padding: 0.6rem 1rem;
-  border-left: 2px solid var(--accent);
+  border-left: 2px solid color-mix(in srgb, var(--accent) 50%, transparent);
   background: var(--tint-rose);
   color: var(--muted);
 }

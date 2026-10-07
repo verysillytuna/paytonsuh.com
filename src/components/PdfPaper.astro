@@ -108,6 +108,15 @@ const { src, label, width = '46rem' } = Astro.props;
     position: absolute;
     inset: 0;
   }
+  /* soften the white paper against the dark theme */
+  :global(:root[data-theme='dark']) .paper-stack :global(.sheet) {
+    filter: brightness(0.86) sepia(0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .paper-stack :global(.sheet) {
+      filter: brightness(0.86) sepia(0.06);
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     .paper-stack :global(.sheet) {
       transition: none;

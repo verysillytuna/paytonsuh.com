@@ -177,23 +177,22 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
   }
   .card {
     padding: 1rem 1rem 0.25rem;
-    border: 1px solid var(--rule);
-    border-radius: 3px;
+    border-radius: 4px;
   }
   .card :global(.math-figure) {
     margin-bottom: 0.75rem;
   }
   .rose {
     background: var(--tint-rose);
-    border-top: 2px solid var(--accent);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent) 45%, transparent);
   }
   .denim {
     background: var(--tint-denim);
-    border-top: 2px solid var(--accent-2);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--accent-2) 45%, transparent);
   }
   .sand {
     background: var(--tint-sand);
-    border-top: 2px solid var(--earth);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--earth) 45%, transparent);
   }
   .now {
     display: grid;

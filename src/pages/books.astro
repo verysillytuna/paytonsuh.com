@@ -4,7 +4,7 @@ import { shelves } from '../data/books';
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 // Spine colours cycle through the palette; heights vary a little like a real shelf.
-const tones = ['var(--accent)', 'var(--accent-2)', 'var(--fg)', 'var(--earth)', 'var(--muted)'];
+const tones = ['var(--accent)', 'var(--accent-2)', 'var(--plum)', 'var(--earth)', 'var(--muted)'];
 const count = shelves.reduce((n, s) => n + s.books.length, 0);
 ---
 
@@ -74,8 +74,8 @@ const count = shelves.reduce((n, s) => n + s.books.length, 0);
     gap: 3px;
     min-height: 210px;
     padding: 0 0.5rem;
-    border-bottom: 6px solid var(--earth);
-    box-shadow: 0 6px 0 -3px color-mix(in srgb, var(--earth) 55%, transparent);
+    border-bottom: 5px solid color-mix(in srgb, var(--earth) 70%, var(--bg));
+    box-shadow: 0 5px 0 -2px color-mix(in srgb, var(--earth) 30%, transparent);
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: thin;
@@ -90,7 +90,7 @@ const count = shelves.reduce((n, s) => n + s.books.length, 0);
     align-items: center;
     justify-content: space-between;
     padding: 0.6rem 0 0.5rem;
-    background: var(--tone);
+    background: color-mix(in srgb, var(--tone) 88%, var(--bg));
     color: var(--bg);
     text-decoration: none;
     border-radius: 2px 2px 0 0;

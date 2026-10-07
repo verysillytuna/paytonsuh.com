@@ -22,10 +22,10 @@ const year = new Date().getFullYear();
     /* palette swatches in the footer link colours */
     --fg: var(--on-ink);
     --rule: color-mix(in srgb, var(--on-ink) 25%, transparent);
-    --accent: #d39aa6;
-    --accent-2: #9fb6d2;
-    --earth: #c9a58c;
-    --plum: #c49ab1;
+    --accent: #dcb0b9;
+    --accent-2: #b4c5d9;
+    --earth: #d3b8a4;
+    --plum: #d0b3c3;
   }
   .inner {
     padding-top: 2.25rem;
@@ -44,15 +44,16 @@ const year = new Date().getFullYear();
   }
   .stripe {
     /* the wardrobe, as a stripe: burgundy, plum, indigo, washed denim, leather, sand */
-    height: 6px;
+    height: 4px;
+    opacity: 0.75;
     background: linear-gradient(
       90deg,
-      #6e2a3a 0 18%,
-      #563046 18% 34%,
-      #2c3550 34% 52%,
-      #8fa9c6 52% 70%,
-      #7b5a45 70% 86%,
-      #d8cdb8 86% 100%
+      #8a4555 0 18%,
+      #79546a 18% 34%,
+      #4a5470 34% 52%,
+      #b3c3d6 52% 70%,
+      #8a6c57 70% 86%,
+      #dcd3c2 86% 100%
     );
   }
 </style>

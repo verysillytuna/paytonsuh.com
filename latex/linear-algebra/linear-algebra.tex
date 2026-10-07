@@ -18,15 +18,15 @@
 \usepackage{microtype}
 
 % ---------------------------------------------------------------- palette
-\definecolor{burgundy}{HTML}{6E2A3A}
-\definecolor{denim}{HTML}{4B6585}
-\definecolor{leather}{HTML}{7B5A45}
-\definecolor{plum}{HTML}{563046}
-\definecolor{ink}{HTML}{1E2230}
-\definecolor{muted}{HTML}{5E6573}
-\definecolor{tintrose}{HTML}{F6EFED}
-\definecolor{tintdenim}{HTML}{EEF2F6}
-\definecolor{tintsand}{HTML}{F3EEE5}
+\definecolor{burgundy}{HTML}{8A4555}
+\definecolor{denim}{HTML}{58708D}
+\definecolor{leather}{HTML}{84674F}
+\definecolor{plum}{HTML}{79546A}
+\definecolor{ink}{HTML}{2A2E3A}
+\definecolor{muted}{HTML}{676C77}
+\definecolor{tintrose}{HTML}{F8F3F1}
+\definecolor{tintdenim}{HTML}{F2F4F6}
+\definecolor{tintsand}{HTML}{F6F2EB}
 \color{ink}
 \hypersetup{colorlinks,linkcolor=burgundy,urlcolor=denim}
 
@@ -34,7 +34,7 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{0.45em}
 \setlist{nosep,leftmargin=1.4em,topsep=0.2em}
-\titleformat{\section}{\Large\scshape\color{burgundy}}{\thesection}{0.8em}{}[{\color{burgundy!40}\titlerule}]
+\titleformat{\section}{\Large\scshape\color{burgundy}}{\thesection}{0.8em}{}[{\color{burgundy!30}\titlerule}]
 \titleformat{\subsection}{\large\itshape\color{denim}}{\thesubsection}{0.7em}{}
 \titlespacing*{\section}{0pt}{1.6em}{0.7em}
 \titlespacing*{\subsection}{0pt}{1.1em}{0.35em}
@@ -49,7 +49,7 @@
 \tcbset{
   base/.style={enhanced,breakable,boxrule=0pt,sharp corners,left=8pt,right=8pt,top=5pt,bottom=5pt,
     before skip=0.7em,after skip=0.7em,fonttitle=\scshape,coltitle=#1,colbacktitle=white,
-    attach title to upper={.\enspace},borderline west={2pt}{0pt}{#1}},
+    attach title to upper={.\enspace},borderline west={1.2pt}{0pt}{#1!70}},
 }
 \newtcolorbox{defbox}[1][]{base=denim,colback=tintdenim,title={Definition#1}}
 \newtcolorbox{thmbox}[1][]{base=burgundy,colback=tintrose,title={Theorem#1}}

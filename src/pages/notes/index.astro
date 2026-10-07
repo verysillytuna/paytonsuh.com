@@ -52,7 +52,7 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
     margin: 1.5rem 0;
     padding: 1rem 1.1rem;
     background: var(--tint-denim);
-    border-left: 3px solid var(--accent-2);
+    border-left: 2px solid color-mix(in srgb, var(--accent-2) 60%, transparent);
     color: var(--fg);
     text-decoration: none;
     transition: transform 0.3s, box-shadow 0.3s;
