@@ -16,8 +16,25 @@ const isActive = (href: string) =>
         </a>
       ))
     }
+    <button id="theme-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">◐</button>
   </nav>
 </header>
+
+<script>
+  const btn = document.getElementById('theme-toggle')!;
+  const root = document.documentElement;
+  const isDark = () =>
+    root.dataset.theme
+      ? root.dataset.theme === 'dark'
+      : matchMedia('(prefers-color-scheme: dark)').matches;
+  btn.addEventListener('click', () => {
+    const next = isDark() ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {}
+  });
+</script>
 
 <style>
   header {
@@ -46,6 +63,20 @@ const isActive = (href: string) =>
     text-decoration: none;
     font-variant: small-caps;
     letter-spacing: 0.05em;
+  }
+  nav {
+    align-items: baseline;
+  }
+  button {
+    background: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  button:hover {
+    color: var(--accent);
   }
   nav a:hover,
   nav a[aria-current='page'] {

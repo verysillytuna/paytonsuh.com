@@ -3,6 +3,7 @@ title: 'The rationals are dense in the reals'
 date: 2026-10-06
 summary: 'A short proof from the Archimedean property, and why completeness is doing the real work.'
 tags: [analysis]
+draft: true # formatting template; not published
 ---
 
 A first result in any analysis course: between any two real numbers there is a rational.

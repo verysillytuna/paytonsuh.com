@@ -11,6 +11,8 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
   <h1>Notes</h1>
   <p class="muted">Expository notes, problem write-ups, and things I am learning.</p>
 
+  {notes.length === 0 && <p><em>Notes are on the way.</em></p>}
+
   <ul>
     {
       notes.map((n) => (

@@ -22,9 +22,10 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
   </p>
   <p>
     I am highly invested in the intersection of mathematics, the physical
-    sciences, and computer science. Within mathematics, I am most interested in
-    <em>analysis</em>, <em>algebra</em>, <em>topology</em>, and
-    <em>probability</em>.
+    sciences, and computer science. Within mathematics, I enjoy pure
+    mathematics, especially <em>analysis</em>, <em>algebra</em>, and
+    <em>topology</em>, along with <em>probability</em>, which sits between the
+    pure and the applied.
   </p>
   <p>
     I enjoy open-ended problems that require abstract thinking, and I train my
@@ -50,6 +51,19 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     Planned beyond the major: topology, probability theory, and stochastic
     calculus.
   </p>
+  <p>Preparing for the William Lowell Putnam Mathematical Competition.</p>
+
+  <h3>Reading</h3>
+  <ul>
+    <li>Walter Rudin, <cite>Principles of Mathematical Analysis</cite></li>
+    <li>
+      Friedberg, Insel &amp; Spence, <cite>Linear Algebra</cite>, 5th ed.
+    </li>
+    <li>
+      Richard Elman,
+      <a href="https://www.math.ucla.edu/~rse/algebra_book.pdf"><cite>Lectures on Abstract Algebra</cite></a>
+    </li>
+  </ul>
 
   {
     recent.length > 0 && (

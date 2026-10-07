@@ -12,8 +12,9 @@
   color-scheme: light;
 }
 
+/* Dark palette: follows the system unless the toggle has picked a theme. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']) {
     --bg: #161614;
     --fg: #e8e6df;
     --muted: #a19e94;
@@ -23,6 +24,16 @@
     --code-bg: #22211e;
     color-scheme: dark;
   }
+}
+:root[data-theme='dark'] {
+  --bg: #161614;
+  --fg: #e8e6df;
+  --muted: #a19e94;
+  --rule: #34332e;
+  --accent: #e09a8a;
+  --accent-hover: #f2b9ab;
+  --code-bg: #22211e;
+  color-scheme: dark;
 }
 
 *,
