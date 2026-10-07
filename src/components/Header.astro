@@ -8,12 +8,13 @@ const isActive = (href: string) =>
 ---
 
 <div class="topbar">
-  <a href={`mailto:${site.email}`}>{site.email}</a>
+  <span class="la">
+    <span class="city">Los Angeles</span>
+    <span id="la-clock"></span>
+    <span id="la-weather"></span>
+  </span>
   <span class="links">
-    <a href="/cv.pdf">CV (PDF)</a>
-    <a href={site.github}>GitHub</a>
-    <a href={site.linkedin}>LinkedIn</a>
-    <a href="/resources/putnam/">Putnam bank</a>
+    <a href={`mailto:${site.email}`}>{site.email}</a>
     <a href="/admin/">Admin</a>
   </span>
 </div>
@@ -33,6 +34,41 @@ const isActive = (href: string) =>
 </header>
 
 <script>
+  // Los Angeles time (updates each minute) and current weather from Open-Meteo (free, no key).
+  const clock = document.getElementById('la-clock')!;
+  const fmt = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Los_Angeles',
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  const tick = () => {
+    const parts = Object.fromEntries(fmt.formatToParts(new Date()).map((p) => [p.type, p.value]));
+    clock.textContent = `${parts.weekday}, ${parts.month} ${parts.day} · ${parts.hour}:${parts.minute} ${parts.dayPeriod}`;
+  };
+  tick();
+  setTimeout(() => (tick(), setInterval(tick, 60_000)), 60_000 - (Date.now() % 60_000));
+
+  const sky = (code: number) =>
+    code === 0 ? 'Clear'
+    : code <= 2 ? 'Partly cloudy'
+    : code === 3 ? 'Cloudy'
+    : code <= 48 ? 'Fog'
+    : code <= 57 ? 'Drizzle'
+    : code <= 67 ? 'Rain'
+    : code <= 77 ? 'Snow'
+    : code <= 82 ? 'Showers'
+    : 'Thunderstorms';
+  fetch('https://api.open-meteo.com/v1/forecast?latitude=34.05&longitude=-118.24&current=temperature_2m,weather_code&temperature_unit=fahrenheit')
+    .then((r) => r.json())
+    .then(({ current }) => {
+      document.getElementById('la-weather')!.textContent =
+        `${Math.round(current.temperature_2m)}°F, ${sky(current.weather_code)}`;
+    })
+    .catch(() => {});
+
   const btn = document.getElementById('theme-toggle')!;
   const root = document.documentElement;
   const isDark = () =>
@@ -53,14 +89,29 @@ const isActive = (href: string) =>
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: baseline;
     gap: 0.2rem 1rem;
-    padding-top: 0.6rem;
+    padding: 0.55rem 0 0.5rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--rule) 70%, transparent);
     font-size: 0.8rem;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
   }
+  .la,
   .topbar .links {
     display: flex;
     flex-wrap: wrap;
     gap: 0.2rem 0.9rem;
+  }
+  .la > span:not(:empty) + span:not(:empty)::before {
+    content: '·';
+    margin-right: 0.45rem;
+    margin-left: -0.45rem;
+    opacity: 0.6;
+  }
+  .city {
+    font-variant: small-caps;
+    letter-spacing: 0.05em;
   }
   .topbar a {
     color: var(--accent);
