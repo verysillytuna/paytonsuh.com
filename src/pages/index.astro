@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import { site } from '../site';
+import MathFigure from '../components/MathFigure.astro';
 import portrait from '../assets/portrait.jpg';
 
 const recent = (await getCollection('notes', ({ data }) => !data.draft))
@@ -41,9 +42,10 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
   </p>
 
   <p>
-    Outside of coursework, I lead a materials-science project on refractory
-    coatings for nuclear thermal propulsion, analyze stellar light curves for
-    variable stars, and tutor physics and chemistry. See
+    Outside of coursework, I am a co-investigator on ZrC-ARC, a NASA
+    L’SPACE–funded project on refractory coatings for hypersonic and nuclear
+    thermal propulsion, and I tutor physics and chemistry. Until June 2026 I
+    analyzed stellar light curves for variable stars. See
     <a href="/research/">Research</a>.
   </p>
   <p>
@@ -52,6 +54,12 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     and hold a third-degree black belt in taekwondo.
   </p>
 
+  <MathFigure
+    kind="lorenz"
+    caption="The Lorenz attractor: two trajectories starting 10<sup>−5</sup> apart, burgundy and blue, eventually part ways."
+    height={200}
+  />
+
   <h2>Currently</h2>
   <ul>
     <li>Math 110AH: Algebra (Honors)</li>
@@ -59,8 +67,8 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     <li>Math 131AH: Analysis (Honors)</li>
   </ul>
   <p class="muted">
-    Planned beyond the major: topology, probability theory, and stochastic
-    calculus.
+    Planned: abstract algebra, analysis, complex analysis, geometric analysis,
+    topology, probability theory, and stochastic calculus.
   </p>
   <p>Preparing for the William Lowell Putnam Mathematical Competition.</p>
 

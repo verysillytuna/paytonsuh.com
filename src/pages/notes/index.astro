@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import MathFigure from '../../components/MathFigure.astro';
 import { getCollection } from 'astro:content';
 
 const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
@@ -10,6 +11,8 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
 <Base title="Notes" description="Mathematical notes and expository writing.">
   <h1>Notes</h1>
   <p class="muted">Expository notes, problem write-ups, and things I am learning.</p>
+
+  <MathFigure kind="fourier" caption="A square wave from its first seven odd Fourier terms, Σ 4 sin(<i>nt</i>)/<i>nπ</i>." />
 
   {notes.length === 0 && <p><em>Notes are on the way.</em></p>}
 

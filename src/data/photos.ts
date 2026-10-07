@@ -15,7 +15,7 @@ export const photos: Photo[] = [
   { file: 'painted-ladies', caption: 'The Painted Ladies, San Francisco' },
   { file: 'rice-field', caption: 'Rice field, Japan' },
   { file: 'shinsekai', caption: 'Shinsekai, Osaka' },
-  { file: 'cathedral', caption: 'Cathedral' },
+  { file: 'cathedral', caption: 'St. Paul Cathedral, Pittsburgh' },
   { file: 'stream', caption: 'Mountain stream, Japan' },
   { file: 'cable-car', caption: 'Cable car, San Francisco' },
   { file: 'niagara', caption: 'Niagara Gorge' },

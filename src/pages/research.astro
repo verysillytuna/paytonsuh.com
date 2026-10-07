@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import MathFigure from '../components/MathFigure.astro';
 import { projects } from '../data/projects';
+import { recommendation } from '../data/recommendation';
 
 const order = { ongoing: 0, planned: 1, completed: 2 } as const;
 const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
@@ -12,6 +14,8 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
     Mathematics, computer science, and the physical sciences — ongoing work,
     directed reading, and completed projects.
   </p>
+
+  <MathFigure kind="brownian" caption="Sample paths of Brownian motion inside the envelope ±2√<i>t</i>." />
 
   {
     sorted.map((p) => (
@@ -34,6 +38,15 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
       </article>
     ))
   }
+
+  <h2>From a recommendation</h2>
+  <figure class="rec">
+    {recommendation.quotes.map((q) => <blockquote>“{q}”</blockquote>)}
+    <figcaption>
+      {recommendation.author}, {recommendation.role}<br />
+      <span class="muted">{recommendation.context}</span>
+    </figcaption>
+  </figure>
 </Base>
 
 <style>
@@ -42,6 +55,19 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
   }
   article h3 {
     margin-bottom: 0.15rem;
+  }
+  .rec {
+    margin: 0;
+  }
+  .rec blockquote {
+    margin: 0 0 0.75rem;
+    font-style: italic;
+    color: var(--fg);
+    border-left-color: var(--accent);
+  }
+  .rec figcaption {
+    margin-top: 1rem;
+    font-size: 0.9rem;
   }
   .meta {
     font-size: 0.9rem;

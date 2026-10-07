@@ -1,0 +1,132 @@
+---
+// The CV itself. Rendered on /cv/ and on /cv/document/, which is printed to public/cv.pdf (npm run cv:pdf).
+import { site } from '../site';
+---
+
+<div class="cv">
+  <header class="cv-head">
+    <h1>{site.name}</h1>
+    <p>
+      Department of Mathematics, UCLA ·
+      <a href={`mailto:${site.email}`}>{site.email}</a> ·
+      <a href="https://paytonsuh.com">paytonsuh.com</a>
+    </p>
+  </header>
+
+  <h2>Education</h2>
+  <dl>
+    <dt>University of California, Los Angeles <span class="date">2026–</span></dt>
+    <dd>
+      B.S. Mathematics, expected June 2028<br />
+      M.A. Mathematics, expected June 2029 <span class="muted">(Departmental Scholars Program, intended)</span>
+    </dd>
+    <dt>Santa Monica College <span class="date">2024–2026</span></dt>
+    <dd>
+      A.S.-T. Mathematics; A.S. General Science. GPA 3.85/4.00; Dean’s List 2024–2026.
+      <span class="muted">Began college at sixteen.</span>
+    </dd>
+  </dl>
+
+  <h2>Coursework</h2>
+  <dl>
+    <dt>UCLA, in progress</dt>
+    <dd>Algebra (110AH), Linear Algebra (115AH), Analysis (131AH), all honors</dd>
+    <dt>UCLA, planned</dt>
+    <dd>
+      Abstract Algebra, Analysis, Complex Analysis, Geometric Analysis, Topology,
+      Probability Theory, Stochastic Calculus
+    </dd>
+    <dt>Santa Monica College</dt>
+    <dd>
+      Calculus I–III, Linear Algebra, Differential Equations; Engineering Physics I–III,
+      Modern Physics, Chemistry, Circuit Analysis; Programming (Python, C++, Data
+      Structures, MATLAB), Data Science
+    </dd>
+  </dl>
+
+  <h2>Research</h2>
+  <dl>
+    <dt>ZrC-ARC: Zirconium Carbide Architected Refractory Coatings <span class="date">2026–</span></dt>
+    <dd>
+      Co-Investigator. Grain morphology and hydrogen resistance of ZrC coatings for
+      hypersonic and nuclear thermal propulsion; LAMMPS/COMSOL simulation, thermal
+      cycling, SEM/XRD characterization. Advisor: Prof. Daniel R. Mumm, UC Irvine
+      Materials Research Institute. $10,000 seed grant, NASA L’SPACE Program (Spring 2026).
+    </dd>
+    <dt>Stellar Light Curve Analysis <span class="date">2025–2026</span></dt>
+    <dd>
+      Python and machine-learning pipeline for public survey light curves. Co-author of a
+      research submission reporting a previously unreported flaring variable star.
+    </dd>
+  </dl>
+
+  <h2>Teaching</h2>
+  <dl>
+    <dt>Student Instructor, SMC Science Tutoring Center <span class="date">2026–</span></dt>
+    <dd>Selected by the STEM department to tutor physics and chemistry; 10+ sessions weekly.</dd>
+    <dt>Mentor and Lead Builder, VEX Robotics (11444X, 334R) <span class="date">2023–</span></dt>
+    <dd>
+      Mentored teams to VEX Worlds Division Semifinals and the California Region 4 State
+      Tournament; design, controls, and autonomous programming.
+    </dd>
+    <dt>Taekwondo Instructor, Elite Taekwondo Center <span class="date">until 2024</span></dt>
+    <dd>Kukkiwon-certified third-degree black belt.</dd>
+  </dl>
+
+  <h2>Service</h2>
+  <dl>
+    <dt>Vice President of California, Back to School Together <span class="date">2025–</span></dt>
+    <dd>Raised over $1,200 for STEM education for students in Mexico and Guatemala.</dd>
+  </dl>
+
+  <h2>Skills</h2>
+  <dl class="inline">
+    <dt>Computing</dt>
+    <dd>Python, C++, MATLAB, Simulink, SQL, LaTeX</dd>
+    <dt>Engineering</dt>
+    <dd>SolidWorks, CAD, circuit analysis, data analysis and visualization</dd>
+    <dt>Languages</dt>
+    <dd>English (native), Korean (native), Japanese (advanced)</dd>
+  </dl>
+
+  <h2>Other</h2>
+  <p>
+    First violin, YOLA HOLA Symphony Orchestra and Torres Chamber Ensemble (2018–2024).
+    Interests: bouldering (V7), billiards (8-ball and 9-ball), cooking, photography.
+  </p>
+</div>
+
+<style>
+  .cv h1 {
+    margin: 0;
+  }
+  .cv-head p {
+    margin: 0.25rem 0 0;
+    color: var(--muted);
+  }
+  .cv dl {
+    margin: 0;
+  }
+  .cv dt {
+    font-weight: 600;
+    margin-top: 0.7rem;
+  }
+  .cv dd {
+    margin: 0.1rem 0 0 1.25rem;
+  }
+  .cv .date {
+    float: right;
+    font-weight: 400;
+    color: var(--muted);
+    padding-left: 1rem;
+  }
+  .cv .inline dt {
+    float: left;
+    clear: left;
+    width: 7rem;
+    margin-top: 0.3rem;
+  }
+  .cv .inline dd {
+    margin: 0.3rem 0 0 8rem;
+  }
+</style>

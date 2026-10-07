@@ -10,7 +10,7 @@ export default defineConfig({
   site: 'https://paytonsuh.com',
   // Astro's HTML compression drops the space at line breaks before inline tags ("and<em>").
   compressHTML: false,
-  integrations: [mdx(), sitemap()],
+  integrations: [mdx(), sitemap({ filter: (page) => !page.includes('/cv/document/') })],
   markdown: {
     processor: unified({ remarkPlugins: [remarkMath], rehypePlugins: [rehypeKatex] }),
   },

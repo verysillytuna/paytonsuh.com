@@ -1,11 +1,15 @@
 :root {
-  --bg: #fdfcf8;
-  --fg: #1d1d1b;
-  --muted: #5f5d57;
-  --rule: #dcd8cc;
-  --accent: #7a1f1f;
-  --accent-hover: #a32b2b;
-  --code-bg: #f3f0e7;
+  /* Palette drawn from a wardrobe: off-white cotton, raw indigo denim, washed denim,
+     grey denim, burgundy, and brown leather. */
+  --bg: #f6f4ef;
+  --fg: #1e2230;
+  --muted: #5e6573;
+  --rule: #d8d5cc;
+  --accent: #6e2a3a;
+  --accent-hover: #8c3a4c;
+  --accent-2: #4b6585;
+  --earth: #7b5a45;
+  --code-bg: #ebe8e1;
   --measure: 40rem;
   --serif: 'EB Garamond', 'Garamond', 'Georgia', serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
@@ -15,24 +19,28 @@
 /* Dark palette: follows the system unless the toggle has picked a theme. */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #161614;
-    --fg: #e8e6df;
-    --muted: #a19e94;
-    --rule: #34332e;
-    --accent: #e09a8a;
-    --accent-hover: #f2b9ab;
-    --code-bg: #22211e;
+    --bg: #161920;
+    --fg: #e8e5de;
+    --muted: #9ba2ae;
+    --rule: #2e333e;
+    --accent: #c98b98;
+    --accent-hover: #dea7b2;
+    --accent-2: #8ea8c7;
+    --earth: #b8937a;
+    --code-bg: #1f232c;
     color-scheme: dark;
   }
 }
 :root[data-theme='dark'] {
-  --bg: #161614;
-  --fg: #e8e6df;
-  --muted: #a19e94;
-  --rule: #34332e;
-  --accent: #e09a8a;
-  --accent-hover: #f2b9ab;
-  --code-bg: #22211e;
+  --bg: #161920;
+  --fg: #e8e5de;
+  --muted: #9ba2ae;
+  --rule: #2e333e;
+  --accent: #c98b98;
+  --accent-hover: #dea7b2;
+  --accent-2: #8ea8c7;
+  --earth: #b8937a;
+  --code-bg: #1f232c;
   color-scheme: dark;
 }
 

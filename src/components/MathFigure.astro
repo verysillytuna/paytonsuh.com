@@ -1,0 +1,39 @@
+---
+// A small animated mathematical figure with a caption. Renderers live in src/scripts/math-figures.ts.
+export type FigureKind = 'lorenz' | 'brownian' | 'fourier' | 'torus' | 'perspective';
+
+interface Props {
+  kind: FigureKind;
+  caption: string;
+  height?: number;
+}
+
+const { kind, caption, height = 160 } = Astro.props;
+---
+
+<figure class="math-figure">
+  <canvas data-math-figure={kind} style={`height:${height}px`} role="img" aria-label={caption}></canvas>
+  <figcaption set:html={caption} />
+</figure>
+
+<script>
+  import { mountAll } from '../scripts/math-figures';
+  mountAll();
+</script>
+
+<style>
+  .math-figure {
+    margin: 0 0 2rem;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+  }
+  figcaption {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    font-style: italic;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
