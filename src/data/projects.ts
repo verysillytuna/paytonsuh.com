@@ -15,8 +15,9 @@ export const projects: Project[] = [
     area: 'Materials Science',
     status: 'ongoing',
     period: '2026–',
+    links: [{ label: 'Project overview (PDF)', href: '/research/zrc-arc-overview.pdf' }],
     description:
-      'Co-investigator on a student team from UC Berkeley, UCLA, and UC Irvine studying how the size, shape, and alignment of grains in zirconium carbide coatings affect their resistance to hot hydrogen at 1500–2500 K, the failure mode behind delamination in hypersonic scramjets and nuclear thermal propulsion. The work combines LAMMPS and COMSOL simulation with physical prototyping, thermal cycling to 1900 K, and SEM/XRD characterization assisted by a machine-learning image pipeline, under the guidance of Prof. Daniel R. Mumm at the UC Irvine Materials Research Institute. Awarded a $10,000 seed grant from the NASA L’SPACE Program (Spring 2026) in a national proposal competition.',
+      'Co-investigator (originally principal investigator) leading the research and LAMMPS simulation work for a student team from UC Berkeley, UCLA, and UC Irvine studying how the size, shape, and alignment of grains in zirconium carbide coatings affect their resistance to hot hydrogen at 1500–2500 K, the failure mode behind delamination in hypersonic scramjets and nuclear thermal propulsion. The work combines LAMMPS and COMSOL simulation with physical prototyping, thermal cycling to 1900 K, and SEM/XRD characterization assisted by a machine-learning image pipeline, under the guidance of Prof. Daniel R. Mumm at the UC Irvine Materials Research Institute. Awarded a $10,000 seed grant from the NASA L’SPACE Program (Spring 2026) in a national proposal competition.',
   },
   {
     title: 'Stellar Light Curve Analysis',
