@@ -1,0 +1,129 @@
+---
+import Base from '../../layouts/Base.astro';
+import CodeTabs from '../../components/CodeTabs.astro';
+import { Image } from 'astro:assets';
+import katex from 'katex';
+import pipeline from '../../data/lightcurve/pipeline.py?raw';
+import scanning from '../../data/lightcurve/scanning.py?raw';
+import flare from '../../assets/lightcurve/flare-light-curve.png';
+import s91 from '../../assets/lightcurve/sector-91.png';
+import s92 from '../../assets/lightcurve/sector-92.png';
+
+const centroid = katex.renderToString(
+  String.raw`x_c = \frac{\sum_i x_i F_i}{\sum_i F_i}, \qquad y_c = \frac{\sum_i y_i F_i}{\sum_i F_i}`,
+  { displayMode: true },
+);
+---
+
+<Base
+  title="Stellar Light Curves"
+  description="Detecting stellar flares and variable stars in TESS data: pipeline, code, and light curves."
+>
+  <p class="crumb"><a href="/research/">← Research</a></p>
+  <h1>Stellar Light Curves</h1>
+  <p class="muted subtitle">Astrophysics · TESS data · 2025–June 2026</p>
+
+  <p>
+    Working directly with data from NASA’s TESS satellite, I built a pipeline to
+    detect and characterize stellar flares and to study how the brightness of
+    stars changes over time. The work led to a co-authored research submission
+    reporting a previously unreported variable star with frequent high-energy
+    flares.
+  </p>
+
+  <figure class="plot wide">
+    <Image src={flare} alt="Light curve: flux versus time showing several sharp flares around BTJD 3485–3489" widths={[800, 1400]} sizes="(max-width: 64rem) 100vw, 64rem" />
+    <figcaption>
+      Aperture-masked light curve of TIC 1603615314 (TESS Sector 80). Sharp spikes
+      are flare candidates; the pipeline then asks whether each one really comes
+      from the target.
+    </figcaption>
+  </figure>
+
+  <h2>Is the flare on the star?</h2>
+  <p>
+    A spike in brightness is not enough: in TESS’s large pixels, light from a
+    neighbouring star can masquerade as a flare. For each cadence the pipeline
+    computes the flux-weighted centroid of the aperture,
+  </p>
+  <div class="display" set:html={centroid} />
+  <p>
+    and compares it between a pre-flare baseline and the flare peak. If the
+    centroid shifts toward another source, the emission is likely contamination;
+    if it stays on the target’s WCS-projected position, the flare is the
+    target’s own.
+  </p>
+
+  <div class="pair">
+    <figure class="plot">
+      <Image src={s91} alt="Sector 91 light curve with two large flux spikes" widths={[600, 900]} sizes="(max-width: 40rem) 100vw, 30rem" />
+      <figcaption>TESS Sector 91.</figcaption>
+    </figure>
+    <figure class="plot">
+      <Image src={s92} alt="Sector 92 light curve with large flux spikes" widths={[600, 900]} sizes="(max-width: 40rem) 100vw, 30rem" />
+      <figcaption>TESS Sector 92.</figcaption>
+    </figure>
+  </div>
+
+  <h2>Code</h2>
+  <CodeTabs
+    id="lc"
+    files={[
+      {
+        name: 'pipeline.py',
+        label: 'Flare detection',
+        code: pipeline,
+        summary:
+          'Loads a TESS Target Pixel File, builds an aperture-masked light curve, finds the brightest cadence, computes flux-weighted centroids at every cadence, and measures the centroid shift between baseline and peak.',
+        tools: ['lightkurve', 'astropy', 'numpy', 'TESS TPF', 'WCS'],
+      },
+      {
+        name: 'scanning.py',
+        label: 'NGC 2516 survey',
+        code: scanning,
+        summary:
+          'A planned extension to a whole open cluster: query Gaia DR3 for NGC 2516 members by parallax and proper motion, cross-match to the TESS Input Catalog, then download and stitch light curves for automated variability and anomaly detection.',
+        tools: ['astroquery', 'lightkurve', 'Gaia DR3', 'TESS TIC', 'pandas'],
+      },
+    ]}
+  />
+</Base>
+
+<style>
+  .crumb {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+  }
+  .subtitle {
+    margin-bottom: 1.75rem;
+  }
+  .plot {
+    margin: 1.5rem 0;
+  }
+  .plot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border: 1px solid var(--rule);
+    background: #fff;
+  }
+  .wide {
+    --w: min(52rem, calc(100vw - 2rem));
+    width: var(--w);
+    margin-left: calc((100% - var(--w)) / 2);
+  }
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+  }
+  figcaption {
+    margin-top: 0.35rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--muted);
+  }
+  .display {
+    margin: 0;
+  }
+</style>

@@ -39,7 +39,7 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
         )}
         {p.page && (
           <p class="links">
-            <a href={p.page}>Read the project overview →</a>
+            <a href={p.page}>{p.page.includes('light') ? 'Code, plots, and method →' : 'Read the project overview →'}</a>
           </p>
         )}
         {p.links && (

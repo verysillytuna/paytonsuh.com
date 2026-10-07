@@ -441,7 +441,223 @@ const flow: Factory = () => {
   };
 };
 
-const factories: Record<string, Factory> = { lorenz, brownian, fourier, torus, perspective, lattice, conformal, flow };
+// Möbius strip: a normal vector carried once around the core comes back pointing the other way.
+const mobius: Factory = () => {
+  let t = 0;
+  return (ctx, w, h, c) => {
+    t += 0.008;
+    const R = h * 0.3, half = h * 0.12, rot = t * 0.4, tilt = 1.05;
+    const cr = Math.cos(rot), sr = Math.sin(rot), ct = Math.cos(tilt), st = Math.sin(tilt);
+    const P = (u: number, v: number) => {
+      // u ∈ [0, 2π) around the core, v ∈ [−1, 1] across the band
+      let X = (R + v * half * Math.cos(u / 2)) * Math.cos(u);
+      let Y = (R + v * half * Math.cos(u / 2)) * Math.sin(u);
+      let Z = v * half * Math.sin(u / 2);
+      [X, Y] = [X * cr - Y * sr, X * sr + Y * cr];
+      [Y, Z] = [Y * ct - Z * st, Y * st + Z * ct];
+      return [w / 2 + X, h / 2 + Y, Z];
+    };
+    const U = 90, V = 6;
+    // quads sorted back to front
+    const quads: { z: number; pts: number[][]; band: number }[] = [];
+    for (let i = 0; i < U; i++)
+      for (let j = 0; j < V; j++) {
+        const u0 = (i / U) * TAU, u1 = ((i + 1) / U) * TAU, v0 = -1 + (2 * j) / V, v1 = -1 + (2 * (j + 1)) / V;
+        const pts = [P(u0, v0), P(u1, v0), P(u1, v1), P(u0, v1)];
+        quads.push({ z: pts.reduce((a, p) => a + p[2], 0) / 4, pts, band: j });
+      }
+    quads.sort((a, b) => a.z - b.z);
+    for (const q of quads) {
+      const shade = 0.25 + 0.5 * ((q.z / half + 1) / 2);
+      ctx.fillStyle = withAlpha(q.band % 2 ? c.accent2 : c.muted, shade * 0.55);
+      ctx.strokeStyle = withAlpha(c.accent2, 0.35);
+      ctx.lineWidth = 0.6;
+      ctx.beginPath();
+      q.pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+    }
+    // the travelling normal: one lap flips it, two laps restore it
+    const u = (t * 0.9) % (2 * TAU);
+    const [bx, by] = P(u, 0);
+    const [tx, ty] = P(u, 0.95);
+    ctx.strokeStyle = c.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(bx, by);
+    ctx.lineTo(tx, ty);
+    ctx.stroke();
+    ctx.fillStyle = c.accent;
+    ctx.beginPath();
+    ctx.arc(tx, ty, 3, 0, TAU);
+    ctx.fill();
+  };
+};
+
+// Hopf fibration: fibres over a circle of latitude on S², stereographically projected to ℝ³ as linked circles.
+const hopf: Factory = () => {
+  let t = 0;
+  const fibre = (a: number, b: number, cc: number, s: number) => {
+    const k = 1 / Math.sqrt(2 * (1 + cc));
+    const x1 = k * (1 + cc) * Math.cos(s), x2 = k * (a * Math.sin(s) - b * Math.cos(s));
+    const x3 = k * (a * Math.cos(s) + b * Math.sin(s)), x4 = k * (1 + cc) * Math.sin(s);
+    return [x1 / (1 - x4), x2 / (1 - x4), x3 / (1 - x4)];
+  };
+  return (ctx, w, h, c) => {
+    t += 0.005;
+    const lat = 0.35 * Math.sin(t * 0.8);
+    const scale = h * 0.17, cs = Math.cos(t * 0.6), ss = Math.sin(t * 0.6), tl = 0.5;
+    const ct = Math.cos(tl), st = Math.sin(tl);
+    const n = 14;
+    for (let k = 0; k < n; k++) {
+      const phi = (k / n) * TAU + t * 0.4;
+      const cc = lat, r = Math.sqrt(1 - cc * cc);
+      const a = r * Math.cos(phi), b = r * Math.sin(phi);
+      ctx.strokeStyle = withAlpha(k % 2 ? c.accent : c.accent2, 0.75);
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      for (let i = 0; i <= 120; i++) {
+        let [X, Y, Z] = fibre(a, b, cc, (i / 120) * TAU);
+        if (!isFinite(X) || Math.hypot(X, Y, Z) > 8) {
+          ctx.stroke();
+          ctx.beginPath();
+          continue;
+        }
+        [X, Z] = [X * cs + Z * ss, -X * ss + Z * cs];
+        [Y, Z] = [Y * ct - Z * st, Y * st + Z * ct];
+        const px = w / 2 + X * scale, py = h / 2 + Y * scale;
+        i ? ctx.lineTo(px, py) : ctx.moveTo(px, py);
+      }
+      ctx.stroke();
+    }
+  };
+};
+
+// Geometric Brownian motion dS = μS dt + σS dW, with the lognormal law of S_T building up on the right.
+const gbm: Factory = () => {
+  const mu = 0.06, sigma = 0.32, steps = 250, dt = 1 / steps, bins = 36, sMax = 3;
+  const hist = new Array(bins).fill(0);
+  let path: number[] = [1], done = 0, total = 0;
+  const finished: number[][] = [];
+  return (ctx, w, h, c) => {
+    for (let k = 0; k < 6; k++) {
+      const S = path[path.length - 1];
+      path.push(S * Math.exp((mu - sigma * sigma / 2) * dt + sigma * Math.sqrt(dt) * gaussian()));
+      if (path.length > steps) {
+        const ST = path[path.length - 1];
+        hist[Math.min(bins - 1, Math.floor((ST / sMax) * bins))]++;
+        total++;
+        finished.push(path);
+        if (finished.length > 14) finished.shift();
+        path = [1];
+        done++;
+      }
+    }
+    const plotW = w * 0.72, x0 = 6, top = 8, bot = h - 8;
+    const yOf = (S: number) => bot - (Math.min(S, sMax) / sMax) * (bot - top);
+    ctx.strokeStyle = c.rule;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x0, yOf(1));
+    ctx.lineTo(x0 + plotW, yOf(1));
+    ctx.stroke();
+    const draw = (p: number[], color: string, lw: number) => {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lw;
+      ctx.beginPath();
+      p.forEach((S, i) => (i ? ctx.lineTo(x0 + (i / steps) * plotW, yOf(S)) : ctx.moveTo(x0, yOf(S))));
+      ctx.stroke();
+    };
+    finished.forEach((p) => draw(p, withAlpha(c.accent2, 0.28), 1));
+    draw(path, c.accent, 1.5);
+    // histogram of S_T
+    const hx = x0 + plotW + 10, maxBin = Math.max(1, ...hist), hw = w - hx - 6;
+    ctx.fillStyle = withAlpha(c.accent, 0.55);
+    hist.forEach((n, i) => {
+      const y1 = yOf((i / bins) * sMax), y2 = yOf(((i + 1) / bins) * sMax);
+      ctx.fillRect(hx, y2, (n / maxBin) * hw, Math.max(1, y1 - y2 - 1));
+    });
+    // lognormal density for comparison
+    ctx.strokeStyle = c.earth;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    const m = mu - sigma * sigma / 2;
+    let peak = 0;
+    const dens = (S: number) => Math.exp(-((Math.log(S) - m) ** 2) / (2 * sigma * sigma)) / (S * sigma * Math.sqrt(TAU));
+    for (let i = 1; i <= 100; i++) peak = Math.max(peak, dens((i / 100) * sMax));
+    for (let i = 1; i <= 100; i++) {
+      const S = (i / 100) * sMax;
+      const x = hx + (dens(S) / peak) * hw * 0.98, y = yOf(S);
+      i === 1 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    if (total > 30) ctx.stroke();
+    void done;
+  };
+};
+
+// Quadratic variation: Σ (ΔW)² over finer and finer partitions of [0, t] converges to t.
+const qv: Factory = () => {
+  const N = 1024;
+  let W: number[] = [], level = 2, hold = 0;
+  const reset = () => {
+    W = [0];
+    for (let i = 1; i <= N; i++) W.push(W[i - 1] + gaussian() / Math.sqrt(N));
+    level = 2;
+    hold = 0;
+  };
+  reset();
+  return (ctx, w, h, c) => {
+    if (++hold % 45 === 0) {
+      if (level < N) level *= 2;
+      else if (hold > 45 * 12) reset();
+    }
+    const x0 = 6, pw = w - 12, midTop = h * 0.28, s = h * 0.14;
+    // the path, sampled on the current partition
+    ctx.strokeStyle = withAlpha(c.accent2, 0.35);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    W.forEach((v, i) => (i ? ctx.lineTo(x0 + (i / N) * pw, midTop - v * s) : ctx.moveTo(x0, midTop)));
+    ctx.stroke();
+    const stride = N / level;
+    ctx.strokeStyle = c.accent2;
+    ctx.lineWidth = 1.3;
+    ctx.beginPath();
+    for (let k = 0; k <= level; k++) {
+      const i = k * stride, x = x0 + (i / N) * pw, y = midTop - W[i] * s;
+      k ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.stroke();
+    // running sum of squared increments vs. the line y = t
+    const base = h - 8, top = h * 0.52;
+    const yOf = (v: number) => base - v * (base - top);
+    ctx.strokeStyle = c.rule;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(x0, yOf(0));
+    ctx.lineTo(x0 + pw, yOf(1));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = c.accent;
+    ctx.lineWidth = 1.6;
+    ctx.beginPath();
+    let q = 0;
+    ctx.moveTo(x0, yOf(0));
+    for (let k = 1; k <= level; k++) {
+      const d = W[k * stride] - W[(k - 1) * stride];
+      q += d * d;
+      ctx.lineTo(x0 + (k / level) * pw, yOf(Math.min(q, 1.6)));
+    }
+    ctx.stroke();
+    ctx.fillStyle = c.muted;
+    ctx.font = 'italic 12px "EB Garamond", serif';
+    ctx.fillText(`n = ${level}`, x0 + pw - 52, top - 4);
+  };
+};
+
+const factories: Record<string, Factory> = {
+  lorenz, brownian, fourier, torus, perspective, lattice, conformal, flow, mobius, hopf, gbm, qv,
+};
 
 function readColors(): Colors {
   const s = getComputedStyle(document.documentElement);

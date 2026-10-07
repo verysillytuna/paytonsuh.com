@@ -10,16 +10,120 @@ import MathFigure from '../../components/MathFigure.astro';
     caption="A square grid under the Möbius map <i>z</i> ↦ (<i>z</i> − <i>a</i>)/(1 − <i>āz</i>): lines become circles, and right angles survive."
     height={190}
   />
-  <CvBody>
-    <p slot="actions" class="actions">
-      <a href="/cv.pdf" download="Payton-Suh-CV.pdf">Download PDF</a>
-    </p>
-  </CvBody>
+
+  <div class="head">
+    <h1>Curriculum Vitae</h1>
+    <a href="/cv.pdf" download="Payton-Suh-CV.pdf">Download PDF</a>
+  </div>
+
+  <div class="paper-stack" data-cv aria-label="CV">
+    <noscript><CvBody /></noscript>
+  </div>
+
+  <details class="text">
+    <summary>Read as plain text</summary>
+    <CvBody />
+  </details>
 </Base>
 
+<script>
+  import 'pdfjs-dist/web/pdf_viewer.css';
+  import { getDocument, GlobalWorkerOptions, TextLayer } from 'pdfjs-dist';
+  import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+  GlobalWorkerOptions.workerSrc = workerUrl;
+
+  const stack = document.querySelector<HTMLElement>('[data-cv]')!;
+  const pdf = await getDocument({ url: '/cv.pdf' }).promise;
+  const pages = await Promise.all(Array.from({ length: pdf.numPages }, (_, i) => pdf.getPage(i + 1)));
+  const sheets = pages.map(() => {
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet';
+    stack.appendChild(sheet);
+    return sheet;
+  });
+
+  let lastWidth = 0;
+  async function render() {
+    const width = stack.clientWidth;
+    if (width === lastWidth) return;
+    lastWidth = width;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    for (const [i, page] of pages.entries()) {
+      const viewport = page.getViewport({ scale: width / page.getViewport({ scale: 1 }).width });
+      const sheet = sheets[i];
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(viewport.width * dpr);
+      canvas.height = Math.floor(viewport.height * dpr);
+      await page.render({ canvas, viewport, transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined }).promise;
+      const text = document.createElement('div');
+      text.className = 'textLayer';
+      sheet.style.setProperty('--scale-factor', String(viewport.scale));
+      sheet.style.aspectRatio = `${viewport.width} / ${viewport.height}`;
+      sheet.replaceChildren(canvas, text);
+      await new TextLayer({ textContentSource: page.streamTextContent(), container: text, viewport }).render();
+      sheet.classList.add('ready');
+    }
+  }
+
+  new ResizeObserver(() => render()).observe(stack);
+</script>
+
 <style>
-  .actions {
-    margin: 0.5rem 0 0;
-    font-size: 0.9rem;
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .head a {
+    font-variant: small-caps;
+    letter-spacing: 0.05em;
+  }
+  .paper-stack {
+    --w: min(46rem, calc(100vw - 2rem));
+    width: var(--w);
+    margin: 1.25rem 0 2rem calc((100% - var(--w)) / 2);
+    display: grid;
+    gap: 1.5rem;
+  }
+  .paper-stack :global(.sheet) {
+    position: relative;
+    background: #fff;
+    aspect-ratio: 8.5 / 11;
+    box-shadow:
+      0 1px 2px rgb(30 34 48 / 0.08),
+      0 12px 32px -12px rgb(30 34 48 / 0.25);
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .paper-stack :global(.sheet.ready) {
+    opacity: 1;
+    transform: none;
+  }
+  .paper-stack :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .paper-stack :global(.textLayer) {
+    position: absolute;
+    inset: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .paper-stack :global(.sheet) {
+      transition: none;
+    }
+  }
+  .text summary {
+    cursor: pointer;
+    color: var(--accent);
+  }
+  .text[open] summary {
+    margin-bottom: 1rem;
   }
 </style>

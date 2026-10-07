@@ -25,9 +25,9 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
 
   <p>
     I am an 18-year-old third-year mathematics student at UCLA. I began college
-    at sixteen at Santa Monica College before transferring to UCLA, where I am
-    working toward a combined B.S./M.A. through the Departmental Scholars
-    Program. I intend to pursue a PhD in mathematics.
+    at sixteen at Santa Monica College before transferring to UCLA, and I plan
+    to apply to the Departmental Scholars Program for a combined B.S./M.A. I
+    intend to pursue a PhD in mathematics.
   </p>
   <p>
     I am highly invested in the intersection of mathematics, the physical
@@ -51,9 +51,10 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     <a href="/research/">Research</a>.
   </p>
   <p>
-    Away from the desk, I boulder (up to V7), play pool (8-ball and 9-ball),
-    cook, and take <a href="/photography/">photographs</a>. I also play violin
-    and hold a third-degree black belt in taekwondo.
+    I am into photography, mostly streets, stations, and temples, and drawn to
+    lines that converge and forms that repeat; some of it is
+    <a href="/photography/">here</a>. Away from the desk I also boulder (up to
+    V7), play pool (8-ball and 9-ball), and cook.
   </p>
 
   <MathFigure
@@ -61,6 +62,14 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     caption="The Lorenz attractor: two trajectories starting 10<sup>−5</sup> apart, burgundy and blue, eventually part ways."
     height={200}
   />
+
+  <h2>Things I think about</h2>
+  <div class="figures">
+    <MathFigure kind="mobius" caption="<b>Möbius strip.</b> Carry a normal vector once around and it returns pointing the other way: the surface is non-orientable." height={170} />
+    <MathFigure kind="hopf" caption="<b>Hopf fibration.</b> <i>S</i><sup>3</sup> as a bundle of circles over <i>S</i><sup>2</sup>; any two fibres are linked." height={170} />
+    <MathFigure kind="gbm" caption="<b>Geometric Brownian motion.</b> d<i>S</i> = μ<i>S</i> d<i>t</i> + σ<i>S</i> d<i>W</i>; terminal prices pile up into a lognormal law." height={170} />
+    <MathFigure kind="qv" caption="<b>Quadratic variation.</b> Σ(Δ<i>W</i>)² over finer partitions converges to <i>t</i>: the reason Itô’s formula has a second-order term." height={170} />
+  </div>
 
   <h2>Currently</h2>
   <ul>
@@ -129,6 +138,14 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     opacity: 0.55;
     mask-image: radial-gradient(ellipse at center, #000 45%, transparent 80%);
     pointer-events: none;
+  }
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0 1.5rem;
+  }
+  .figures :global(figcaption) {
+    text-align: left;
   }
   .portrait {
     flex: none;

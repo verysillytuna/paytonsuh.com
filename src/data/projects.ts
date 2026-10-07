@@ -41,6 +41,7 @@ export const projects: Project[] = [
     area: 'Astrophysics · Data Science',
     status: 'completed',
     period: '2025–June 2026',
+    page: '/research/light-curves/',
     description:
       'Python and machine-learning pipeline to extract, decompose, and analyze stellar light curves from public survey data and flag anomalous emission. Co-authored a research submission reporting a previously unreported variable star with frequent high-energy flares.',
   },
