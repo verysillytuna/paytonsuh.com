@@ -32,7 +32,7 @@ export const schools: School[] = [
         subject: 'Planned',
         courses: [
           { code: '', name: 'Abstract Algebra' },
-          { code: '', name: 'Analysis' },
+          { code: '', name: 'Real Analysis' },
           { code: '', name: 'Complex Analysis' },
           { code: '', name: 'Geometric Analysis' },
           { code: '', name: 'Topology' },
@@ -67,11 +67,7 @@ export const schools: School[] = [
         courses: [
           { code: 'PHYSCS 21', name: 'Mechanics' },
           { code: 'PHYSCS 22', name: 'Electricity & Magnetism' },
-          {
-            code: 'PHYSCS 23',
-            name: 'Fluids, Waves, Thermodynamics & Optics',
-            note: 'Class project: a Python program comparing solar-activity data from two satellites.',
-          },
+          { code: 'PHYSCS 23', name: 'Fluids, Waves, Thermodynamics & Optics' },
           { code: 'PHYSCS 24', name: 'Modern Physics' },
         ],
       },
@@ -87,7 +83,7 @@ export const schools: School[] = [
         courses: [
           { code: 'ENGR 11', name: 'SolidWorks' },
           { code: 'ENGR 21 + 22', name: 'Circuits, lecture and lab' },
-          { code: 'ENGR 220', name: 'MATLAB', note: 'CC' },
+          { code: 'ENGR 220', name: 'MATLAB', note: 'Cerritos College' },
         ],
       },
       {
@@ -111,6 +107,7 @@ export const schools: School[] = [
     ],
     activities: [
       'Scholastic Art & Writing Awards: Gold Key, Poetry',
+      'Scholastic Art & Writing Awards: Silver Key, Poetry',
       'Science Olympiad: four-time medalist',
       'National Speech & Debate',
     ],
@@ -129,7 +126,9 @@ export const schools: School[] = [
       {
         subject: 'Dual enrollment',
         courses: [
-          { code: 'SPANISH 1–3', name: 'Elementary Spanish I–II, Intermediate Spanish I' },
+          { code: 'SPANISH 1', name: 'Elementary Spanish I' },
+          { code: 'SPANISH 2', name: 'Elementary Spanish II' },
+          { code: 'SPANISH 3', name: 'Intermediate Spanish I' },
           { code: 'HEALTH 11', name: 'Principles of Healthy Living' },
           { code: 'COUNSEL 20', name: 'Post-Secondary Education' },
           { code: 'FINANCE 8', name: 'Personal Finance' },

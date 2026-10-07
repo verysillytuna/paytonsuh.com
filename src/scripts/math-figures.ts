@@ -1,7 +1,7 @@
 // Canvas renderers for the per-page mathematical figures.
 // Each renderer is a factory returning a frame function drawn on a cleared canvas (CSS pixel coordinates).
 
-type Colors = { fg: string; muted: string; rule: string; accent: string; accent2: string; earth: string };
+type Colors = { fg: string; muted: string; rule: string; accent: string; accent2: string; earth: string; plum: string };
 type Frame = (ctx: CanvasRenderingContext2D, w: number, h: number, c: Colors) => void;
 type Factory = () => Frame;
 
@@ -1039,7 +1039,52 @@ const svd: Factory = () => {
   };
 };
 
+// The golden rectangle: removing a square leaves a smaller golden rectangle, forever; quarter arcs trace the spiral.
+const golden: Factory = () => {
+  const PHI = (1 + Math.sqrt(5)) / 2;
+  let t = 0;
+  return (ctx, w, h, c) => {
+    t += 0.006;
+    const H = h - 16, W = H * PHI;
+    const x0 = (w - W) / 2, y0 = 8;
+    const n = 11;
+    const shown = Math.min(n, (t % 9) * 2); // squares revealed so far
+    let x = x0, y = y0, rw = W, rh = H;
+    const tones = [c.accent, c.accent2, c.earth, c.plum];
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = withAlpha(c.muted, 0.6);
+    ctx.strokeRect(x0, y0, W, H);
+    for (let i = 0; i < n; i++) {
+      const vis = Math.max(0, Math.min(1, shown - i));
+      if (vis <= 0) break;
+      const s = Math.min(rw, rh);
+      // square position and the arc centre, cycling left, top, right, bottom
+      let sx = x, sy = y, cx = 0, cy = 0, a0 = 0;
+      switch (i % 4) {
+        case 0: sx = x; sy = y; cx = x + s; cy = y + s; a0 = Math.PI; x += s; rw -= s; break;
+        case 1: sx = x; sy = y; cx = x; cy = y + s; a0 = -Math.PI / 2; y += s; rh -= s; break;
+        case 2: sx = x + rw - s; sy = y; cx = x + rw - s; cy = y; a0 = 0; rw -= s; break;
+        case 3: sx = x; sy = y + rh - s; cx = x + s; cy = y + rh - s; a0 = Math.PI / 2; rh -= s; break;
+      }
+      ctx.fillStyle = withAlpha(tones[i % 4], 0.1 * vis);
+      ctx.fillRect(sx, sy, s, s);
+      ctx.strokeStyle = withAlpha(c.muted, 0.5 * vis);
+      ctx.strokeRect(sx, sy, s, s);
+      ctx.strokeStyle = withAlpha(c.accent, vis);
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.arc(cx, cy, s, a0, a0 + (Math.PI / 2) * vis);
+      ctx.stroke();
+      ctx.lineWidth = 1;
+    }
+    ctx.fillStyle = c.muted;
+    ctx.font = 'italic 13px "EB Garamond", serif';
+    ctx.fillText('φ = (1 + √5) / 2', x0 + W + 10 < w - 90 ? x0 + W + 10 : 8, h - 10);
+  };
+};
+
 const factories: Record<string, Factory> = {
+  golden,
   linmap, svd,
   hairyball, conesphere, montecarlo, martingale,
   lorenz, brownian, fourier, torus, perspective, lattice, conformal, flow, mobius, hopf, gbm, qv,
@@ -1048,7 +1093,7 @@ const factories: Record<string, Factory> = {
 function readColors(): Colors {
   const s = getComputedStyle(document.documentElement);
   const v = (name: string) => s.getPropertyValue(name).trim();
-  return { fg: v('--fg'), muted: v('--muted'), rule: v('--rule'), accent: v('--accent'), accent2: v('--accent-2'), earth: v('--earth') };
+  return { fg: v('--fg'), muted: v('--muted'), rule: v('--rule'), accent: v('--accent'), accent2: v('--accent-2'), earth: v('--earth'), plum: v('--plum') };
 }
 
 export function mountAll() {

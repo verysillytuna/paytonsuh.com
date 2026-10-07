@@ -1,0 +1,116 @@
+---
+// Renders a PDF inline as paper sheets (pdf.js canvas + selectable text layer). Fades in page by page.
+interface Props {
+  src: string;
+  label: string;
+  width?: string;
+}
+const { src, label, width = '46rem' } = Astro.props;
+---
+
+<div class="paper-stack" data-pdf={src} aria-label={label} style={`--max:${width}`}>
+  <slot name="fallback" />
+</div>
+
+<script>
+  import 'pdfjs-dist/web/pdf_viewer.css';
+  import { getDocument, GlobalWorkerOptions, TextLayer } from 'pdfjs-dist';
+  import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+  GlobalWorkerOptions.workerSrc = workerUrl;
+
+  for (const stack of document.querySelectorAll<HTMLElement>('[data-pdf]')) {
+    const pdf = await getDocument({ url: stack.dataset.pdf! }).promise;
+    const pages = await Promise.all(Array.from({ length: pdf.numPages }, (_, i) => pdf.getPage(i + 1)));
+    stack.replaceChildren();
+    const sheets = pages.map((page) => {
+      const sheet = document.createElement('div');
+      const vp = page.getViewport({ scale: 1 });
+      sheet.className = 'sheet';
+      sheet.style.aspectRatio = `${vp.width} / ${vp.height}`;
+      stack.appendChild(sheet);
+      return sheet;
+    });
+
+    // Render each sheet when it approaches the viewport; re-render on width changes.
+    const rendered = new Map<number, number>();
+    const render = async (i: number) => {
+      const width = stack.clientWidth;
+      if (rendered.get(i) === width) return;
+      rendered.set(i, width);
+      const page = pages[i];
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+      const viewport = page.getViewport({ scale: width / page.getViewport({ scale: 1 }).width });
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.floor(viewport.width * dpr);
+      canvas.height = Math.floor(viewport.height * dpr);
+      await page.render({ canvas, viewport, transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined }).promise;
+      const text = document.createElement('div');
+      text.className = 'textLayer';
+      sheets[i].style.setProperty('--scale-factor', String(viewport.scale));
+      sheets[i].replaceChildren(canvas, text);
+      await new TextLayer({ textContentSource: page.streamTextContent(), container: text, viewport }).render();
+      sheets[i].classList.add('ready');
+    };
+    const visible = new Set<number>();
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          const i = sheets.indexOf(e.target as HTMLDivElement);
+          if (e.isIntersecting) {
+            visible.add(i);
+            render(i);
+          }
+        }),
+      { rootMargin: '600px 0px' },
+    );
+    sheets.forEach((s) => io.observe(s));
+    let lastWidth = stack.clientWidth;
+    new ResizeObserver(() => {
+      if (stack.clientWidth === lastWidth) return;
+      lastWidth = stack.clientWidth;
+      visible.forEach((i) => render(i));
+    }).observe(stack);
+  }
+</script>
+
+<style>
+  .paper-stack {
+    --w: min(var(--max), calc(100vw - 2rem));
+    width: var(--w);
+    margin: 1.25rem 0 2rem calc((100% - var(--w)) / 2);
+    display: grid;
+    gap: 1.5rem;
+  }
+  .paper-stack :global(.sheet) {
+    position: relative;
+    background: #fff;
+    aspect-ratio: 8.5 / 11;
+    box-shadow:
+      0 1px 2px rgb(30 34 48 / 0.08),
+      0 12px 32px -12px rgb(30 34 48 / 0.25);
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .paper-stack :global(.sheet.ready) {
+    opacity: 1;
+    transform: none;
+  }
+  .paper-stack :global(canvas) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .paper-stack :global(.textLayer) {
+    position: absolute;
+    inset: 0;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .paper-stack :global(.sheet) {
+      transition: none;
+    }
+  }
+</style>

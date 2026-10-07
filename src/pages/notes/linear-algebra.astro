@@ -1,0 +1,49 @@
+---
+import Base from '../../layouts/Base.astro';
+import MathFigure from '../../components/MathFigure.astro';
+import PdfPaper from '../../components/PdfPaper.astro';
+---
+
+<Base
+  title="Linear Algebra: A Reference"
+  description="A typeset reference for linear algebra: notation, definitions, and theorems from vector spaces to the SVD."
+>
+  <p class="crumb"><a href="/notes/">← Notes</a></p>
+  <div class="head">
+    <h1>Linear Algebra: A Reference</h1>
+    <a href="/notes/linear-algebra.pdf" download="Linear-Algebra-Reference.pdf">Download PDF</a>
+  </div>
+  <p class="muted">
+    Notation, definitions, and theorems for a proof-based first course, following Friedberg, Insel &amp; Spence:
+    vector spaces, linear maps, determinants, eigenvalues, Jordan form, inner product spaces, the spectral theorem,
+    and the SVD. Typeset in LaTeX.
+  </p>
+
+  <MathFigure
+    kind="linmap"
+    caption="A linear map moves the whole grid at once; dashed lines are its eigenvectors, and the shaded square’s area becomes det <i>A</i>."
+    height={180}
+  />
+
+  <PdfPaper src="/notes/linear-algebra.pdf" label="Linear Algebra: A Reference" width="50rem">
+    <p slot="fallback"><a href="/notes/linear-algebra.pdf">Open the PDF</a></p>
+  </PdfPaper>
+</Base>
+
+<style>
+  .crumb {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+  }
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+  .head a {
+    font-variant: small-caps;
+    letter-spacing: 0.05em;
+  }
+</style>

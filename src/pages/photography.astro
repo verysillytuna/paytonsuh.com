@@ -11,6 +11,16 @@ const items = photos.map((p) => {
   if (!mod) throw new Error(`Missing photo: ${p.file}.jpg`);
   return { ...p, src: mod.default };
 });
+
+// Column spans on a 12-column grid, cycled so neighbouring photos differ in size.
+// Portraits get narrower spans; some photos drop down a little to break the baseline.
+const pattern = [7, 5, 4, 4, 4, 5, 7, 6, 6, 4, 8, 3, 5, 4];
+const layout = items.map((p, i) => {
+  const ratio = p.src.width / p.src.height;
+  let c = pattern[i % pattern.length];
+  if (ratio < 1) c = Math.max(3, Math.min(5, c - 2));
+  return { c, cm: c >= 6 ? 2 : 1, drop: i % 5 === 2 || i % 7 === 4, align: i % 3 === 1 ? 'end' : 'start' };
+});
 ---
 
 <Base title="Photography" description="Photographs by Payton Suh: perspective and repetition.">
@@ -21,18 +31,22 @@ const items = photos.map((p) => {
     Los Angeles.
   </p>
 
-  <MathFigure kind="perspective" caption="Parallel lines meet at a point at infinity: the projective plane, on the ground." height={130} />
+  <MathFigure kind="golden" caption="The golden rectangle: cut off a square and what remains is golden again. The spiral through the squares is the photographer’s composition guide, and the reason for the φ." height={170} />
 
-  <div class="collage">
+  <div class="collage" data-collage>
     {
       items.map((p, i) => (
-        <figure>
+        <figure
+          class:list={{ drop: layout[i].drop }}
+          style={`--c:${layout[i].c};--cm:${layout[i].cm};--ar:${(p.src.width / p.src.height).toFixed(4)}`}
+          data-align={layout[i].align}
+        >
           <a href={p.src.src} data-index={i} aria-label={`Open: ${p.caption}`}>
             <Image
               src={p.src}
               alt={p.caption}
               widths={[480, 960, 1440]}
-              sizes="(max-width: 40rem) 100vw, 420px"
+              sizes={`(max-width: 40rem) 100vw, ${Math.round((layout[i].c / 12) * 1100)}px`}
               loading={i < 6 ? 'eager' : 'lazy'}
             />
           </a>
@@ -52,6 +66,23 @@ const items = photos.map((p) => {
     <button type="button" class="lb-next" aria-label="Next photo">›</button>
   </dialog>
 </Base>
+
+<script>
+  // Masonry on a CSS grid: each figure spans as many 4px rows as its rendered height needs.
+  const grid = document.querySelector<HTMLElement>('[data-collage]')!;
+  const figures = [...grid.querySelectorAll<HTMLElement>('figure')];
+  function layoutRows() {
+    if (getComputedStyle(grid).gridAutoRows === 'auto') return;
+    for (const f of figures) {
+      f.style.gridRowEnd = 'auto';
+      const h = f.getBoundingClientRect().height;
+      f.style.gridRowEnd = `span ${Math.ceil((h + 20) / 4)}`;
+    }
+  }
+  new ResizeObserver(layoutRows).observe(grid);
+  grid.querySelectorAll('img').forEach((img) => img.addEventListener('load', layoutRows));
+  layoutRows();
+</script>
 
 <script>
   const dialog = document.querySelector<HTMLDialogElement>('.lightbox')!;
@@ -89,16 +120,29 @@ const items = photos.map((p) => {
 
 <style>
   .collage {
-    /* Masonry columns; photos keep their own proportions. */
-    --w: min(68rem, calc(100vw - 2rem));
+    --w: min(70rem, calc(100vw - 2rem));
     width: var(--w);
     margin: 2.5rem 0 0 calc((100% - var(--w)) / 2);
-    columns: 3 18rem;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-auto-flow: row dense;
     column-gap: 1.25rem;
+    align-items: start;
   }
-  figure {
+  :global(.js) .collage {
+    grid-auto-rows: 4px;
+  }
+  .collage figure {
+    grid-column: span var(--c);
+    margin: 0;
     break-inside: avoid;
-    margin: 0 0 1.75rem;
+  }
+  .collage figure.drop {
+    padding-top: 2.75rem;
+  }
+  .collage figure[data-align='end'] figcaption {
+    justify-content: flex-end;
+    text-align: right;
   }
   figure a {
     /* small passe-partout frame */
@@ -107,33 +151,46 @@ const items = photos.map((p) => {
     padding: 5px;
     border: 1px solid var(--rule);
     background: var(--bg);
-    transition: border-color 0.3s;
+    transition:
+      border-color 0.3s,
+      transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1),
+      box-shadow 0.5s;
   }
   figure a:hover {
     border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -18px rgb(30 34 48 / 0.45);
   }
   figure img {
     display: block;
     width: 100%;
     height: auto;
-    transition:
-      transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
-      filter 0.5s;
+    aspect-ratio: var(--ar);
+    object-fit: cover;
     filter: saturate(0.92);
+    transition: filter 0.5s;
   }
-  figure a:hover img,
-  figure a:focus-visible img {
-    transform: scale(1.04);
+  figure a:hover img {
     filter: saturate(1.05);
   }
-  figcaption {
+  .collage figcaption {
     display: flex;
-    gap: 0.6rem;
-    align-items: baseline;
-    margin-top: 0.5rem;
+    margin-top: 0.45rem;
     font-size: 0.85rem;
     font-style: italic;
     color: var(--muted);
+  }
+  @media (max-width: 40rem) {
+    .collage {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 0.75rem;
+    }
+    .collage figure {
+      grid-column: span var(--cm);
+    }
+    .collage figure.drop {
+      padding-top: 1.25rem;
+    }
   }
 
   .lightbox {

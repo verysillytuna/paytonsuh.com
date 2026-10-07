@@ -8,7 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "cv:pdf": "astro build && node scripts/cv-pdf.mjs && astro build"
+    "cv:pdf": "astro build && node scripts/cv-pdf.mjs && astro build",
+    "notes:pdf": "cd latex/linear-algebra && tectonic -X compile linear-algebra.tex && cp linear-algebra.pdf ../../public/notes/linear-algebra.pdf"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.2",

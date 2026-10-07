@@ -45,7 +45,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     />
   </head>
   <body>
-    <canvas class="backdrop" aria-hidden="true"></canvas>
     <div class="wrap">
       <Header />
       <main>
@@ -53,10 +52,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       </main>
     </div>
     <Footer />
-    <script>
-      import { mountBackdrop } from '../scripts/backdrop';
-      mountBackdrop(document.querySelector<HTMLCanvasElement>('canvas.backdrop')!);
-    </script>
     <script>
       // Fade content in as it scrolls into view. CSS only hides elements once .js is set.
       const targets = document.querySelectorAll(
