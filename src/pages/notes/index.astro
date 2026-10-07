@@ -20,7 +20,11 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
     <span class="fdesc">Notation, definitions, and theorems from vector spaces to the singular value decomposition, typeset in LaTeX.</span>
   </a>
 
-  {notes.length === 0 && <p class="muted"><em>Handwritten class notes are on the way.</em></p>}
+  <a class="featured" href="/notes/fall-2026/">
+    <span class="tag">Class notes · PDF</span>
+    <span class="ftitle">Class Notes, Fall 2026</span>
+    <span class="fdesc">Weekly lecture notes from honors analysis (131AH), algebra (110AH), and linear algebra (115AH), typeset in LaTeX.</span>
+  </a>
 
   <ul>
     {

@@ -1,0 +1,109 @@
+---
+import Base from '../../layouts/Base.astro';
+import MathFigure from '../../components/MathFigure.astro';
+import PdfPaper from '../../components/PdfPaper.astro';
+
+// One entry per course; add a week by appending to `weeks` (newest last) and dropping the PDF in public/notes/.
+const courses = [
+  {
+    code: 'MATH 131AH',
+    name: 'Analysis (Honors)',
+    blurb: 'Peano axioms, constructing ℚ, ordered fields, the least upper bound property, density of ℚ in ℝ.',
+    weeks: [{ label: 'Week 1', pdf: '/notes/math-131ah-week1.pdf', file: 'MATH-131AH-Week-1.pdf' }],
+  },
+  {
+    code: 'MATH 110AH',
+    name: 'Algebra (Honors)',
+    blurb: 'Magmas to groups, inverses and orders, subgroups, homomorphisms, kernels, normal subgroups, quotients.',
+    weeks: [{ label: 'Week 1', pdf: '/notes/math-110ah-week1.pdf', file: 'MATH-110AH-Week-1.pdf' }],
+  },
+  {
+    code: 'MATH 115AH',
+    name: 'Linear Algebra (Honors)',
+    blurb: 'Vector spaces, subspaces, span, linear independence, bases, the replacement theorem, linear maps.',
+    weeks: [{ label: 'Week 1', pdf: '/notes/math-115ah-week1.pdf', file: 'MATH-115AH-Week-1.pdf' }],
+  },
+];
+---
+
+<Base
+  title="Class Notes, Fall 2026"
+  description="Lecture notes from UCLA's honors analysis, algebra, and linear algebra courses, typeset in LaTeX week by week."
+>
+  <p class="crumb"><a href="/notes/">← Notes</a></p>
+  <h1>Class Notes, Fall 2026</h1>
+  <p class="muted">
+    My lecture notes from this quarter's honors sequences at UCLA, typeset in LaTeX from my handwritten pages each
+    week. Errors are mine.
+  </p>
+
+  <MathFigure
+    kind="mobius"
+    caption="The Möbius band: one side, one edge. Walk once around the core and you come back upside down."
+    height={170}
+  />
+
+  {
+    courses.map((c) => {
+      const latest = c.weeks[c.weeks.length - 1];
+      return (
+        <section>
+          <div class="head">
+            <h2>
+              {c.code}: {c.name}
+            </h2>
+            <span class="weeks">
+              {c.weeks.map((w) => (
+                <a href={w.pdf} download={w.file}>
+                  {w.label} PDF
+                </a>
+              ))}
+            </span>
+          </div>
+          <p class="muted">{c.blurb}</p>
+          <details>
+            <summary>Read {latest.label.toLowerCase()} here</summary>
+            <PdfPaper src={latest.pdf} label={`${c.code} ${latest.label}`} width="50rem">
+              <p slot="fallback">
+                <a href={latest.pdf}>Open the PDF</a>
+              </p>
+            </PdfPaper>
+          </details>
+        </section>
+      );
+    })
+  }
+</Base>
+
+<style>
+  .crumb {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+  }
+  section {
+    margin: 2rem 0;
+  }
+  .head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    flex-wrap: wrap;
+  }
+  h2 {
+    margin: 0;
+  }
+  .weeks {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .weeks a,
+  summary {
+    font-variant: small-caps;
+    letter-spacing: 0.05em;
+  }
+  summary {
+    cursor: pointer;
+    color: var(--accent);
+  }
+</style>
