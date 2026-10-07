@@ -1,7 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import { site } from '../site';
+import portrait from '../assets/portrait.jpg';
 
 const recent = (await getCollection('notes', ({ data }) => !data.draft))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
@@ -10,8 +12,13 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
 
 <Base>
   <section class="intro">
-    <h1>{site.name}</h1>
-    <p class="muted">Undergraduate in Mathematics · {site.affiliation}</p>
+    <div>
+      <h1>{site.name}</h1>
+      <p class="muted">Mathematics · UCLA</p>
+    </div>
+    <figure class="portrait">
+      <Image src={portrait} alt={`Portrait of ${site.name}`} width={180} densities={[1, 2]} loading="eager" />
+    </figure>
   </section>
 
   <p>
@@ -87,7 +94,33 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
 
 <style>
   .intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
     margin-bottom: 1.5rem;
+  }
+  .portrait {
+    flex: none;
+    margin: 0;
+    padding: 5px;
+    border: 1px solid var(--rule);
+    background: var(--bg);
+  }
+  .portrait img {
+    display: block;
+    width: 180px;
+    height: auto;
+  }
+  @media (max-width: 30rem) {
+    .intro {
+      flex-direction: column-reverse;
+      align-items: center;
+      text-align: center;
+    }
+    .portrait img {
+      width: 160px;
+    }
   }
   ul {
     padding-left: 1.2rem;
