@@ -1,0 +1,190 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// The vault exists only after `npm run admin:seal`; without it the page explains how to set it up.
+const found = import.meta.glob('../../data/admin-vault.json', { eager: true, import: 'default' });
+const vault = Object.values(found)[0] ?? null;
+---
+
+<Base title="Admin" description="Private." noindex>
+  <section id="login" class="login">
+    <h1>Admin</h1>
+    {
+      vault ? (
+        <form id="login-form">
+          <label>Username <input name="username" autocomplete="username" required /></label>
+          <label>Password <input name="password" type="password" autocomplete="current-password" required /></label>
+          <button>Sign in</button>
+          <p id="login-error" class="error" role="alert" hidden />
+        </form>
+      ) : (
+        <p class="muted">Not set up. Run <code>npm run admin:seal</code> and commit <code>src/data/admin-vault.json</code>.</p>
+      )
+    }
+  </section>
+
+  <section id="dash" hidden>
+    <div class="top">
+      <h1>Dashboard</h1>
+      <span class="muted small" id="taken"></span>
+      <button type="button" id="refresh">Refresh</button>
+      <button type="button" id="logout">Sign out</button>
+    </div>
+    <p id="flash" class="flash" role="status" hidden></p>
+    <ul id="errors" class="error"></ul>
+
+    <details class="new">
+      <summary>New daily issue</summary>
+      <form id="create-form">
+        <label>Repo <select name="repo" id="repo-select"></select></label>
+        <label>Title <input name="title" id="title-input" /></label>
+        <label>Body <textarea name="body" id="body-input" rows="10"></textarea></label>
+        <label class="check"><input type="checkbox" name="local" /> Needs files on my Mac (adds label <code>local</code>)</label>
+        <button>Open issue</button>
+      </form>
+    </details>
+
+    <h2>Your asks</h2>
+    <ul id="asks" class="list"></ul>
+    <h2>Inbox</h2>
+    <ul id="inbox" class="list"></ul>
+    <h2>Open pull requests</h2>
+    <ul id="prs" class="list"></ul>
+    <h2>Other open issues</h2>
+    <ul id="other" class="list"></ul>
+    <h2>Opportunities</h2>
+    <div class="scroll"><table id="opps"></table></div>
+    <h2>Backlog: Now</h2>
+    <ol id="backlog"></ol>
+    <h2>Projects</h2>
+    <div id="projects"></div>
+    <h2 id="journal-title">Latest journal</h2>
+    <pre id="journal" class="journal"></pre>
+  </section>
+
+  <script is:inline type="application/json" id="vault" set:html={JSON.stringify(vault)} />
+</Base>
+
+<script>
+  import { start } from '../../scripts/admin';
+  start();
+</script>
+
+<style>
+  .small {
+    font-size: 0.88rem;
+  }
+  .login form,
+  .new form {
+    display: grid;
+    gap: 0.7rem;
+    max-width: 22rem;
+  }
+  .new form {
+    max-width: none;
+    margin-top: 0.8rem;
+  }
+  label {
+    display: grid;
+    gap: 0.2rem;
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+  label.check {
+    display: block;
+  }
+  input:not([type='checkbox']),
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: var(--fg);
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
+  }
+  textarea {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+  button {
+    cursor: pointer;
+    color: var(--accent);
+    justify-self: start;
+  }
+  button:hover {
+    border-color: var(--accent);
+  }
+  .top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem 1rem;
+  }
+  .top h1 {
+    margin-right: auto;
+  }
+  .error {
+    color: var(--accent);
+  }
+  .flash {
+    padding: 0.6rem 0.9rem;
+    background: var(--tint-denim);
+    border-left: 2px solid var(--accent-2);
+  }
+  .flash.bad {
+    background: var(--tint-rose);
+    border-color: var(--accent);
+  }
+  :global(.list) {
+    padding-left: 1.1rem;
+  }
+  :global(.list li) {
+    margin: 0.35rem 0;
+  }
+  :global(.tag) {
+    font-size: 0.72rem;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+    color: var(--accent-2);
+    margin-left: 0.35rem;
+  }
+  :global(details.act) {
+    display: inline;
+    font-size: 0.85rem;
+    margin-left: 0.4rem;
+  }
+  :global(details.act summary) {
+    display: inline;
+    cursor: pointer;
+    color: var(--muted);
+  }
+  :global(details.act form) {
+    display: grid;
+    gap: 0.4rem;
+    margin: 0.4rem 0 0.6rem;
+  }
+  .scroll {
+    overflow-x: auto;
+  }
+  :global(#opps) {
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  :global(#opps th),
+  :global(#opps td) {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.35rem 0.6rem 0.35rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .journal {
+    white-space: pre-wrap;
+    font-size: 0.8rem;
+    background: var(--code-bg);
+    padding: 0.8rem;
+    max-height: 30rem;
+    overflow: auto;
+  }
+</style>

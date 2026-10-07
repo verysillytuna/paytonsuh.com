@@ -1,0 +1,43 @@
+% Default preamble for typeset notes: classic LaTeX article style, in the style of a standard homework write-up.
+% (Computer Modern, bold title, italic introduction, unindented justified paragraphs, numbered equations,
+%  nested lists 1. / (a) / i. / A., boxed tables with italic "Table n:" captions.)
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{enumitem}
+\usepackage{array}
+\usepackage[labelsep=colon,textfont=it]{caption}
+\usepackage{braket}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.6em}
+\setlist[enumerate,1]{label=\arabic*.,leftmargin=2.2em}
+\setlist[enumerate,2]{label=(\alph*),leftmargin=2em}
+\setlist[enumerate,3]{label=\roman*.,leftmargin=2em}
+\setlist[enumerate,4]{label=\Alph*.,leftmargin=1.6em,nosep}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\renewcommand{\Re}{\mathcal{R}}
+\renewcommand{\Im}{\mathcal{I}}
+
+% Title block: bold title, then an italic introductory paragraph.
+\newcommand{\notetitle}{Notes}
+\newcommand{\maketitleblock}[1]{{\noindent\Large\bfseries #1\par}\vspace{0.6em}}
+\newenvironment{intro}{\itshape}{\par}

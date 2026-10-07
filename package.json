@@ -9,6 +9,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "cv:pdf": "astro build && node scripts/cv-pdf.mjs && astro build",
+    "admin:seal": "node scripts/admin-seal.ts",
+    "test": "node --test scripts/",
     "notes:pdf": "cd latex/linear-algebra && tectonic -X compile linear-algebra.tex && cp linear-algebra.pdf ../../public/notes/linear-algebra.pdf"
   },
   "dependencies": {

@@ -1,0 +1,89 @@
+---
+import Base from '../../layouts/Base.astro';
+import { programs, closed } from '../../data/summer-programs';
+
+const sorted = [...programs].sort((a, b) => a.sort.localeCompare(b.sort) || a.name.localeCompare(b.name));
+---
+
+<Base title="Summer Research Programs" description="Summer REUs, schools, and counselor jobs for mathematics undergraduates, sorted by deadline.">
+  <h1>Summer Research Programs</h1>
+  <p class="muted">For mathematics undergraduates · gathered October 2026</p>
+
+  <p>
+    Deadlines below are <strong>last cycle's (2026)</strong> unless noted. Most 2027 calls post between November and
+    January, and most deadlines fall in early February, so ask for recommendation letters by early December.
+    Many NSF-funded REUs are limited to U.S. citizens and permanent residents. Always confirm on the official page;
+    <a href="https://www.mathprograms.org/">MathPrograms.org</a> and
+    <a href="https://www.nsf.gov/funding/initiatives/reu/search">NSF's REU search</a> list more.
+  </p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr><th>Program</th><th>Area</th><th>Stipend</th><th>Deadline</th></tr>
+      </thead>
+      <tbody>
+        {
+          sorted.map((p) => (
+            <tr>
+              <td>
+                <a href={p.url}>{p.name}</a>
+                <span class="host">{p.host} · {p.kind}</span>
+                {p.note && <span class="note">{p.note}</span>}
+              </td>
+              <td>{p.area}</td>
+              <td>{p.stipend ?? '—'}</td>
+              <td class="nowrap">{p.deadline}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Not open to outside students, or not running</h2>
+  <ul>
+    {closed.map((c) => <li><strong>{c.name}.</strong> {c.why}</li>)}
+  </ul>
+
+  <p class="muted small">Spotted an error or a missing program? Email <a href="mailto:paytonsuh@ucla.edu">paytonsuh@ucla.edu</a>.</p>
+</Base>
+
+<style>
+  .scroll {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+  th,
+  td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.5rem 0.6rem 0.5rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  th {
+    font-variant: small-caps;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: normal;
+  }
+  .host,
+  .note {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  .note {
+    font-style: italic;
+  }
+  .nowrap {
+    min-width: 6.5rem;
+  }
+  .small {
+    font-size: 0.9rem;
+  }
+</style>

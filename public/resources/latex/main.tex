@@ -1,0 +1,46 @@
+% Lecture-notes template. Keep preamble.tex next to this file.
+% Compile: pdflatex main.tex  (or: tectonic -X compile main.tex)
+\documentclass[11pt]{article}
+\input{preamble.tex}
+
+\begin{document}
+
+\maketitleblock{MATH 131AH: Lecture Title}
+
+\begin{intro}
+One or two sentences on what these notes cover.
+\end{intro}
+
+%----------------------------------------------------------
+% Section: Section Title
+\section{Section Title}
+
+%----------------------------------------------------------
+% Subsection: Subsection Title
+\subsection{Subsection Title}
+\begin{theorem}
+Statement.
+\end{theorem}
+
+Prose that explains the next step,
+\begin{gather}
+    a = b \\
+    b = c
+\end{gather}
+then more prose connecting to the next display.
+
+\begin{proof}
+Argument.
+\end{proof}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|l|}
+\hline
+Proposition & Statement \\ \hline
+$A$ & The outcome is even. \\ \hline
+\end{tabular}
+\caption{A table caption.}
+\end{table}
+
+\end{document}

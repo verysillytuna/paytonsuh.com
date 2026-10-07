@@ -16,6 +16,7 @@ export const nav = [
   { href: '/education/', label: 'Education' },
   { href: '/research/', label: 'Research' },
   { href: '/notes/', label: 'Notes' },
+  { href: '/resources/', label: 'Resources' },
   { href: '/books/', label: 'Books' },
   { href: '/cv/', label: 'CV' },
   { href: '/photography/', label: 'Photos' },
