@@ -85,7 +85,7 @@ import { site } from '../site';
     <dd>Raised over $1,200 for STEM education for students in Mexico and Guatemala.</dd>
   </dl>
 
-  <h2>Skills</h2>
+  <h2>Skills &amp; Interests</h2>
   <dl class="inline">
     <dt>Computing</dt>
     <dd>Python, C++, MATLAB, Simulink, SQL, LaTeX</dd>
@@ -93,13 +93,11 @@ import { site } from '../site';
     <dd>SolidWorks, CAD, circuit analysis, data analysis and visualization</dd>
     <dt>Languages</dt>
     <dd>English (native), Korean (native), Japanese (advanced)</dd>
+    <dt>Music</dt>
+    <dd>First violin, YOLA HOLA Symphony Orchestra and Torres Chamber Ensemble (2018–2024)</dd>
+    <dt>Interests</dt>
+    <dd>Bouldering (V7), billiards (8-ball and 9-ball), cooking, photography</dd>
   </dl>
-
-  <h2>Other</h2>
-  <p>
-    First violin, YOLA HOLA Symphony Orchestra and Torres Chamber Ensemble (2018–2024).
-    Interests: bouldering (V7), billiards (8-ball and 9-ball), cooking, photography.
-  </p>
 </div>
 
 <style>
@@ -133,6 +131,14 @@ import { site } from '../site';
   }
   .cv .sub dd {
     margin-left: 1rem;
+  }
+  .cv h2 {
+    clear: both;
+  }
+  .cv .inline::after {
+    content: '';
+    display: block;
+    clear: both;
   }
   .cv .inline dt {
     float: left;
