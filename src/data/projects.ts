@@ -1,11 +1,14 @@
-// Research, projects, and reading. Add entries as they happen.
-// status: 'ongoing' | 'completed' | 'planned'
+// Research and projects shown on /research/. Add entries as they happen.
 export type Project = {
   title: string;
   area: string;
   status: 'ongoing' | 'completed' | 'planned';
   period: string;
   description: string;
+  /** Distinct roles held over the project's life, newest first. */
+  roles?: { title: string; period: string; description: string }[];
+  /** A dedicated page on this site with more detail. */
+  page?: string;
   links?: { label: string; href: string }[];
 };
 
@@ -14,10 +17,24 @@ export const projects: Project[] = [
     title: 'ZrC-ARC: Zirconium Carbide Architected Refractory Coatings',
     area: 'Materials Science',
     status: 'ongoing',
-    period: '2026–',
-    links: [{ label: 'Project overview (PDF)', href: '/research/zrc-arc-overview.pdf' }],
+    period: 'January 2026–',
+    page: '/research/zrc-arc/',
     description:
-      'Co-investigator (originally principal investigator) leading the research and LAMMPS simulation work for a student team from UC Berkeley, UCLA, and UC Irvine studying how the size, shape, and alignment of grains in zirconium carbide coatings affect their resistance to hot hydrogen at 1500–2500 K, the failure mode behind delamination in hypersonic scramjets and nuclear thermal propulsion. The work combines LAMMPS and COMSOL simulation with physical prototyping, thermal cycling to 1900 K, and SEM/XRD characterization assisted by a machine-learning image pipeline, under the guidance of Prof. Daniel R. Mumm at the UC Irvine Materials Research Institute. Awarded a $10,000 seed grant from the NASA L’SPACE Program (Spring 2026) in a national proposal competition.',
+      'How the size, shape, and alignment of grains in zirconium carbide coatings govern their survival in hot hydrogen at 1500–2500 K, the failure mode behind coating delamination in hypersonic scramjets and nuclear thermal propulsion. Advised by Prof. Daniel R. Mumm, UC Irvine Materials Research Institute. $10,000 seed grant, NASA L’SPACE Program (Spring 2026).',
+    roles: [
+      {
+        title: 'Co-Investigator',
+        period: 'October 2026–',
+        description:
+          'Leads the research and simulation side of the project: molecular-dynamics modeling in LAMMPS of grain morphology, thermal-expansion mismatch, and carbon vacancies in the ZrC lattice.',
+      },
+      {
+        title: 'Principal Investigator',
+        period: 'January–October 2026',
+        description:
+          'Led the project from its founding: assembled the team across UC Berkeley, UCLA, and UC Irvine, and wrote the proposal that won the NASA L’SPACE seed grant in a national competition.',
+      },
+    ],
   },
   {
     title: 'Stellar Light Curve Analysis',

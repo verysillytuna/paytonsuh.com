@@ -13,6 +13,7 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
 
 <Base>
   <section class="intro">
+    <canvas class="hero-flow" data-math-figure="flow" aria-hidden="true"></canvas>
     <div>
       <h1>{site.name}</h1>
       <p class="muted">Mathematics · UCLA</p>
@@ -44,7 +45,8 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
   <p>
     Outside of coursework, I am a co-investigator on ZrC-ARC, a NASA
     L’SPACE–funded project on refractory coatings for hypersonic and nuclear
-    thermal propulsion, where I lead the research and LAMMPS simulation work, and I tutor physics and chemistry. Until June 2026 I
+    thermal propulsion. I was its principal investigator from January to
+    October 2026 and now lead its research and LAMMPS simulation work, and I tutor physics and chemistry. Until June 2026 I
     analyzed stellar light curves for variable stars. See
     <a href="/research/">Research</a>.
   </p>
@@ -106,11 +108,27 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
 
 <style>
   .intro {
+    position: relative;
+    isolation: isolate;
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
+  }
+  .hero-flow {
+    /* full-bleed phase portrait behind the name */
+    position: absolute;
+    z-index: -1;
+    top: -1.5rem;
+    bottom: -1.5rem;
+    left: 50%;
+    width: min(64rem, 100vw);
+    height: calc(100% + 3rem);
+    transform: translateX(-50%);
+    opacity: 0.55;
+    mask-image: radial-gradient(ellipse at center, #000 45%, transparent 80%);
+    pointer-events: none;
   }
   .portrait {
     flex: none;

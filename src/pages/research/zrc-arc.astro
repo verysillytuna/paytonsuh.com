@@ -1,0 +1,170 @@
+---
+import Base from '../../layouts/Base.astro';
+import MathFigure from '../../components/MathFigure.astro';
+import { projects } from '../../data/projects';
+
+const zrc = projects.find((p) => p.page === '/research/zrc-arc/')!;
+---
+
+<Base
+  title="ZrC-ARC"
+  description="ZrC-ARC: zirconium carbide architected refractory coatings for hypersonic and nuclear thermal propulsion."
+>
+  <p class="crumb"><a href="/research/">← Research</a></p>
+  <h1>ZrC-ARC</h1>
+  <p class="muted subtitle">
+    Zirconium Carbide Architected Refractory Coatings · {zrc.period}
+    · <a href="/research/zrc-arc-overview.pdf" download>Overview (PDF)</a>
+  </p>
+
+  <MathFigure
+    kind="lattice"
+    caption="The rock-salt lattice of ZrC: zirconium (blue) and carbon (burgundy). Flickering sites are carbon vacancies, where hydrogen can become trapped."
+    height={220}
+  />
+
+  <h2>My role</h2>
+  <ol class="roles">
+    {
+      zrc.roles!.map((r) => (
+        <li>
+          <p class="role">
+            <strong>{r.title}</strong> <span class="muted">· {r.period}</span>
+          </p>
+          <p>{r.description}</p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <h2>The problem</h2>
+  <p>
+    Hypersonic flight and advanced space propulsion are held back by the same
+    materials challenge. In hydrogen-fueled scramjets, hot reactive hydrogen at
+    1500–2500&nbsp;K continuously attacks combustion-chamber walls and nozzles,
+    causing surface cracking, delamination, and structural degradation. The same
+    failure modes halted NASA’s NERVA nuclear thermal propulsion program in the
+    1970s, where flow channels exposed to hydrogen at similar temperatures could
+    not be protected by the coatings of the time. Decades later, the problem
+    remains unsolved at a fundamental level.
+  </p>
+
+  <h2>Our approach</h2>
+  <p>
+    ZrC-ARC studies an often-overlooked aspect of coating structure: <em>granular
+    morphology</em>. We ask how the size, shape, and alignment of individual grains
+    affect the thermomechanical properties of refractory barriers, targeting the
+    two mechanisms behind delamination:
+  </p>
+  <ul>
+    <li>
+      <strong>Thermal-expansion mismatch</strong> between coating and substrate,
+      which drives cracking under thermal cycling.
+    </li>
+    <li>
+      <strong>Carbon vacancies</strong>, missing carbon atoms in the ZrC lattice that
+      trap hydrogen and accelerate degradation.
+    </li>
+  </ul>
+
+  <div class="stages">
+    <section>
+      <p class="stage-n">Stage I</p>
+      <h3>Simulation</h3>
+      <p>Molecular dynamics in LAMMPS and continuum modeling in COMSOL Multiphysics.</p>
+    </section>
+    <section>
+      <p class="stage-n">Stage II</p>
+      <h3>Prototyping &amp; testing</h3>
+      <p>
+        Thermal cycling to 1900&nbsp;K; SEM/XRD characterization at the UC Irvine
+        Materials Research Institute, with a machine-learning pipeline for
+        microstructural image analysis.
+      </p>
+    </section>
+  </div>
+
+  <h2>Recognition</h2>
+  <p>
+    A <strong>$10,000 seed grant from the NASA L’SPACE Program</strong> (Spring 2026),
+    awarded in a national proposal-writing competition against university teams
+    across the country.
+  </p>
+
+  <h2>Team</h2>
+  <p>
+    Students at UC Berkeley, UCLA, and UC Irvine in materials science,
+    engineering, computer science, and mathematics, advised by
+    <strong>Prof. Daniel R. Mumm</strong> (UC Irvine), whose expertise spans thermal
+    spray coatings, hot corrosion, and microstructural effects on durability.
+    Principal investigator: Preston Hariadi. Project manager: Elbert Chang.
+  </p>
+
+  <h2>Get involved</h2>
+  <p>
+    We are looking for access to deposition equipment (CVD), thermal-cycling
+    furnaces, and SEM/XRD/EDS imaging; faculty with expertise in refractory
+    ceramics, hypersonics, or nuclear thermal propulsion; additional funding; and
+    industry partners in aerospace materials. Reach me at
+    <a href="mailto:paytonsuh@ucla.edu">paytonsuh@ucla.edu</a>.
+  </p>
+</Base>
+
+<style>
+  .crumb {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+  }
+  .subtitle {
+    margin-bottom: 1.75rem;
+  }
+  .roles {
+    list-style: none;
+    padding: 0 0 0 1rem;
+    border-left: 1px solid var(--rule);
+  }
+  .roles li {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+  .roles li::before {
+    content: '';
+    position: absolute;
+    left: calc(-1rem - 4px);
+    top: 0.55em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--accent);
+  }
+  .roles li:first-child::before {
+    background: var(--accent);
+  }
+  .roles p {
+    margin: 0 0 0.2rem;
+  }
+  .stages {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .stages section {
+    border-top: 2px solid var(--accent-2);
+    padding-top: 0.5rem;
+  }
+  .stages section + section {
+    border-top-color: var(--accent);
+  }
+  .stage-n {
+    margin: 0;
+    font-size: 0.8rem;
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .stages h3 {
+    margin: 0.1rem 0 0.4rem;
+  }
+</style>

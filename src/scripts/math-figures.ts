@@ -261,7 +261,187 @@ const perspective: Factory = () => {
   };
 };
 
-const factories: Record<string, Factory> = { lorenz, brownian, fourier, torus, perspective };
+
+// Rock-salt (NaCl-type) lattice of ZrC, slowly rotating; some carbon sites blink out as vacancies.
+const lattice: Factory = () => {
+  const n = 4; // sites per edge
+  type Site = { p: number[]; zr: boolean; phase: number; vacancy: boolean };
+  const sites: Site[] = [];
+  for (let i = 0; i < n; i++)
+    for (let j = 0; j < n; j++)
+      for (let k = 0; k < n; k++) {
+        const zr = (i + j + k) % 2 === 0;
+        sites.push({
+          p: [i - (n - 1) / 2, j - (n - 1) / 2, k - (n - 1) / 2],
+          zr,
+          phase: Math.random() * TAU,
+          vacancy: !zr && Math.random() < 0.22,
+        });
+      }
+  const bonds: [number, number][] = [];
+  sites.forEach((a, i) =>
+    sites.forEach((b, j) => {
+      if (j > i && Math.hypot(a.p[0] - b.p[0], a.p[1] - b.p[1], a.p[2] - b.p[2]) < 1.01) bonds.push([i, j]);
+    }),
+  );
+  let t = 0;
+  return (ctx, w, h, c) => {
+    t += 0.01;
+    const ay = t * 0.5, ax = 0.45 + 0.15 * Math.sin(t * 0.3);
+    const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
+    const unit = h / 5.2, cam = 7;
+    const proj = sites.map(({ p: [x, y, z] }) => {
+      [x, z] = [x * cy + z * sy, -x * sy + z * cy];
+      [y, z] = [y * cx - z * sx, y * sx + z * cx];
+      const s = cam / (cam - z);
+      return { x: w / 2 + x * unit * s, y: h / 2 + y * unit * s, z, s };
+    });
+    ctx.lineWidth = 1;
+    for (const [i, j] of bonds) {
+      const a = proj[i], b = proj[j];
+      ctx.strokeStyle = withAlpha(c.muted, 0.12 + 0.12 * ((a.z + b.z) / 4 + 0.5));
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+    const order = proj.map((_, i) => i).sort((a, b) => proj[a].z - proj[b].z);
+    for (const i of order) {
+      const site = sites[i], q = proj[i];
+      const depth = 0.45 + 0.55 * ((q.z + 2) / 4);
+      const r = (site.zr ? 6.5 : 4) * q.s;
+      if (site.vacancy) {
+        const on = 0.5 + 0.5 * Math.sin(t * 2 + site.phase); // 1 = atom present, 0 = vacancy
+        ctx.setLineDash([2, 2]);
+        ctx.strokeStyle = withAlpha(c.accent, 0.6 * depth);
+        ctx.beginPath();
+        ctx.arc(q.x, q.y, r, 0, TAU);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        if (on < 0.35) {
+          // a trapped hydrogen atom sits in the empty site
+          ctx.fillStyle = withAlpha(c.earth, depth * (1 - on / 0.35));
+          ctx.beginPath();
+          ctx.arc(q.x, q.y, 2 * q.s, 0, TAU);
+          ctx.fill();
+        }
+        ctx.fillStyle = withAlpha(c.accent, on * depth);
+      } else {
+        ctx.fillStyle = withAlpha(site.zr ? c.accent2 : c.accent, depth);
+      }
+      ctx.beginPath();
+      ctx.arc(q.x, q.y, r, 0, TAU);
+      ctx.fill();
+    }
+  };
+};
+
+// A Cartesian grid inside the unit disk carried by the disk automorphism z ↦ (z − a)/(1 − āz), a circling.
+const conformal: Factory = () => {
+  let t = 0;
+  const lines: [number, number][][] = [];
+  const m = 9, samples = 80;
+  for (let k = 1; k < m; k++) {
+    const u = -1 + (2 * k) / m;
+    const half = Math.sqrt(Math.max(0, 1 - u * u)) * 0.999;
+    const h: [number, number][] = [], v: [number, number][] = [];
+    for (let i = 0; i <= samples; i++) {
+      const s = -half + (2 * half * i) / samples;
+      h.push([s, u]);
+      v.push([u, s]);
+    }
+    lines.push(h, v);
+  }
+  const mobius = ([x, y]: [number, number], ax: number, ay: number): [number, number] => {
+    // (z − a) / (1 − conj(a) z)
+    const nx = x - ax, ny = y - ay;
+    const dx = 1 - (ax * x + ay * y), dy = -(ax * y - ay * x);
+    const d = dx * dx + dy * dy;
+    return [(nx * dx + ny * dy) / d, (ny * dx - nx * dy) / d];
+  };
+  return (ctx, w, h, c) => {
+    t += 0.006;
+    const rad = 0.55 * (0.5 + 0.5 * Math.sin(t * 0.7));
+    const ax = rad * Math.cos(t), ay = rad * Math.sin(t);
+    const R = h / 2 - 8;
+    const panels = [w / 2 - R * 1.25, w / 2 + R * 1.25];
+    for (const [pi, cx] of panels.entries()) {
+      ctx.strokeStyle = c.rule;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, h / 2, R, 0, TAU);
+      ctx.stroke();
+      lines.forEach((line, li) => {
+        ctx.strokeStyle = withAlpha(li % 2 ? c.accent : c.accent2, pi === 0 ? 0.35 : 0.8);
+        ctx.beginPath();
+        line.forEach((z, i) => {
+          const [x, y] = pi === 0 ? z : mobius(z, ax, ay);
+          i === 0 ? ctx.moveTo(cx + x * R, h / 2 - y * R) : ctx.lineTo(cx + x * R, h / 2 - y * R);
+        });
+        ctx.stroke();
+      });
+    }
+    // arrow between panels
+    const y = h / 2, x0 = panels[0] + R + 8, x1 = panels[1] - R - 8;
+    if (x1 - x0 > 16) {
+      ctx.strokeStyle = c.muted;
+      ctx.beginPath();
+      ctx.moveTo(x0, y);
+      ctx.lineTo(x1, y);
+      ctx.lineTo(x1 - 5, y - 4);
+      ctx.moveTo(x1, y);
+      ctx.lineTo(x1 - 5, y + 4);
+      ctx.stroke();
+    }
+    ctx.fillStyle = c.earth;
+    ctx.beginPath();
+    ctx.arc(panels[0] + ax * R, h / 2 - ay * R, 3, 0, TAU);
+    ctx.fill();
+  };
+};
+
+// Phase flow of the pendulum θ'' = −sin θ: particles drift along level sets of the energy.
+const flow: Factory = () => {
+  const N = 260, trail = 14;
+  type P = { x: number; y: number; hist: number[][]; age: number };
+  const spawn = (): P => ({ x: (Math.random() * 2 - 1) * 1.5 * Math.PI, y: (Math.random() * 2 - 1) * 2.6, hist: [], age: 0 });
+  const ps = Array.from({ length: N }, () => {
+    const p = spawn();
+    p.age = Math.floor(Math.random() * 300);
+    return p;
+  });
+  return (ctx, w, h, c) => {
+    const sx = w / (3 * Math.PI), sy = h / 6;
+    const dt = 0.02;
+    ctx.lineWidth = 1.2;
+    for (const p of ps) {
+      for (let k = 0; k < 2; k++) {
+        // symplectic Euler keeps orbits closed
+        p.y -= Math.sin(p.x) * dt;
+        p.x += p.y * dt;
+      }
+      if (p.x > 1.5 * Math.PI) p.x -= 3 * Math.PI;
+      if (p.x < -1.5 * Math.PI) p.x += 3 * Math.PI;
+      const px = w / 2 + p.x * sx, py = h / 2 - p.y * sy;
+      const last = p.hist[p.hist.length - 1];
+      if (last && Math.abs(last[0] - px) > w / 2) p.hist = []; // wrapped around
+      p.hist.push([px, py]);
+      if (p.hist.length > trail) p.hist.shift();
+      if (++p.age > 400) Object.assign(p, spawn());
+      const energy = p.y * p.y / 2 - Math.cos(p.x); // < 1: libration, > 1: rotation
+      const color = energy < 1 ? c.accent2 : c.accent;
+      for (let i = 1; i < p.hist.length; i++) {
+        ctx.strokeStyle = withAlpha(color, (i / p.hist.length) * 0.55);
+        ctx.beginPath();
+        ctx.moveTo(p.hist[i - 1][0], p.hist[i - 1][1]);
+        ctx.lineTo(p.hist[i][0], p.hist[i][1]);
+        ctx.stroke();
+      }
+    }
+  };
+};
+
+const factories: Record<string, Factory> = { lorenz, brownian, fourier, torus, perspective, lattice, conformal, flow };
 
 function readColors(): Colors {
   const s = getComputedStyle(document.documentElement);

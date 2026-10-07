@@ -11,6 +11,7 @@ import { site } from '../site';
       <a href={`mailto:${site.email}`}>{site.email}</a> ·
       <a href="https://paytonsuh.com">paytonsuh.com</a>
     </p>
+    <slot name="actions" />
   </header>
 
   <h2>Education</h2>
@@ -48,10 +49,15 @@ import { site } from '../site';
   <dl>
     <dt>ZrC-ARC: Zirconium Carbide Architected Refractory Coatings <span class="date">2026–</span></dt>
     <dd>
-      Co-Investigator (formerly Principal Investigator); leads research and LAMMPS
-      molecular-dynamics simulation. Grain morphology and hydrogen resistance of ZrC
-      coatings for hypersonic and nuclear thermal propulsion. Advisor: Prof. Daniel R. Mumm, UC Irvine
-      Materials Research Institute. $10,000 seed grant, NASA L’SPACE Program (Spring 2026).
+      Grain morphology and hydrogen resistance of ZrC coatings for hypersonic and nuclear
+      thermal propulsion. Advisor: Prof. Daniel R. Mumm, UC Irvine Materials Research
+      Institute. $10,000 seed grant, NASA L’SPACE Program (Spring 2026).
+      <dl class="sub">
+        <dt>Co-Investigator <span class="date">Oct 2026–</span></dt>
+        <dd>Leads research and LAMMPS molecular-dynamics simulation.</dd>
+        <dt>Principal Investigator <span class="date">Jan–Oct 2026</span></dt>
+        <dd>Founded the project, built the team, and wrote the winning proposal.</dd>
+      </dl>
     </dd>
     <dt>Stellar Light Curve Analysis <span class="date">2025–2026</span></dt>
     <dd>
@@ -119,6 +125,14 @@ import { site } from '../site';
     font-weight: 400;
     color: var(--muted);
     padding-left: 1rem;
+  }
+  .cv .sub dt {
+    font-weight: 500;
+    font-style: italic;
+    margin-top: 0.25rem;
+  }
+  .cv .sub dd {
+    margin-left: 1rem;
   }
   .cv .inline dt {
     float: left;

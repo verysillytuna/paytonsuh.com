@@ -1,153 +1,25 @@
 ---
 import Base from '../../layouts/Base.astro';
-import MathFigure from '../../components/MathFigure.astro';
 import CvBody from '../../components/CvBody.astro';
+import MathFigure from '../../components/MathFigure.astro';
 ---
 
 <Base title="CV" description="Curriculum vitae of Payton Suh.">
-  <h1 class="page-title">Curriculum Vitae</h1>
-
-  <MathFigure kind="torus" caption="The trefoil as a (2, 3) torus knot." height={180} />
-
-  <section class="window" aria-label="CV document viewer">
-    <div class="bar">
-      <span class="name">cv.pdf</span>
-      <span class="pages" data-pages>…</span>
-      <span class="tools">
-        <button type="button" data-zoom="-1" aria-label="Zoom out">−</button>
-        <button type="button" data-zoom="0" aria-label="Fit to width">Fit</button>
-        <button type="button" data-zoom="1" aria-label="Zoom in">+</button>
-        <a href="/cv.pdf" download="Payton-Suh-CV.pdf">Download</a>
-      </span>
-    </div>
-    <div class="scroll" data-scroll>
-      <noscript><p><a href="/cv.pdf">Open the PDF</a></p></noscript>
-    </div>
-  </section>
-
-  <details class="text">
-    <summary>Text version</summary>
-    <CvBody />
-  </details>
+  <MathFigure
+    kind="conformal"
+    caption="A square grid under the Möbius map <i>z</i> ↦ (<i>z</i> − <i>a</i>)/(1 − <i>āz</i>): lines become circles, and right angles survive."
+    height={190}
+  />
+  <CvBody>
+    <p slot="actions" class="actions">
+      <a href="/cv.pdf" download="Payton-Suh-CV.pdf">Download PDF</a>
+    </p>
+  </CvBody>
 </Base>
 
-<script>
-  import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
-  import workerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-
-  GlobalWorkerOptions.workerSrc = workerUrl;
-
-  const scroller = document.querySelector<HTMLElement>('[data-scroll]')!;
-  const pagesLabel = document.querySelector<HTMLElement>('[data-pages]')!;
-  const pdf = await getDocument({ url: '/cv.pdf' }).promise;
-  const pages = await Promise.all(Array.from({ length: pdf.numPages }, (_, i) => pdf.getPage(i + 1)));
-  const canvases = pages.map(() => scroller.appendChild(document.createElement('canvas')));
-
-  let zoom = 1; // multiplier on fit-to-width
-  let pending = 0;
-
-  async function render() {
-    const id = ++pending;
-    const fit = (scroller.clientWidth - 32) / pages[0].getViewport({ scale: 1 }).width;
-    const dpr = window.devicePixelRatio || 1;
-    for (const [i, page] of pages.entries()) {
-      const viewport = page.getViewport({ scale: fit * zoom });
-      const canvas = canvases[i];
-      canvas.width = Math.floor(viewport.width * dpr);
-      canvas.height = Math.floor(viewport.height * dpr);
-      canvas.style.width = `${Math.floor(viewport.width)}px`;
-      await page.render({ canvas, viewport, transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined }).promise;
-      if (id !== pending) return; // a newer render superseded this one
-    }
-  }
-
-  function updatePageLabel() {
-    const mid = scroller.scrollTop + scroller.clientHeight / 2;
-    const current = canvases.findIndex((c) => c.offsetTop + c.offsetHeight > mid) + 1 || pages.length;
-    pagesLabel.textContent = `${current} / ${pages.length}`;
-  }
-
-  document.querySelectorAll<HTMLButtonElement>('[data-zoom]').forEach((b) =>
-    b.addEventListener('click', () => {
-      const step = Number(b.dataset.zoom);
-      zoom = step === 0 ? 1 : Math.min(3, Math.max(0.5, zoom * (step > 0 ? 1.25 : 0.8)));
-      render();
-    }),
-  );
-  scroller.addEventListener('scroll', updatePageLabel, { passive: true });
-  let lastWidth = scroller.clientWidth;
-  new ResizeObserver(() => {
-    if (scroller.clientWidth !== lastWidth) {
-      lastWidth = scroller.clientWidth;
-      render();
-    }
-  }).observe(scroller);
-
-  await render();
-  updatePageLabel();
-</script>
-
 <style>
-  .window {
-    border: 1px solid var(--rule);
-    background: var(--code-bg);
-    margin: 1.5rem 0 2rem;
-  }
-  .bar {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.4rem 0.75rem;
-    border-bottom: 1px solid var(--rule);
-    background: var(--bg);
-    font-size: 0.85rem;
-  }
-  .name {
-    font-family: var(--mono);
-    font-size: 0.75rem;
-  }
-  .pages {
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
-  }
-  .tools {
-    margin-left: auto;
-    display: flex;
-    gap: 0.6rem;
-    align-items: center;
-  }
-  .tools button {
-    font: inherit;
-    color: var(--fg);
-    background: none;
-    border: 1px solid var(--rule);
-    min-width: 1.9rem;
-    padding: 0.05rem 0.4rem;
-    cursor: pointer;
-  }
-  .tools button:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-  .scroll {
-    height: min(80vh, 56rem);
-    overflow: auto;
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
-  .scroll :global(canvas) {
-    flex: none;
-    background: #fff;
-    box-shadow: 0 1px 6px rgb(0 0 0 / 0.18);
-  }
-  .text summary {
-    cursor: pointer;
-    color: var(--accent);
-  }
-  .text[open] summary {
-    margin-bottom: 1rem;
+  .actions {
+    margin: 0.5rem 0 0;
+    font-size: 0.9rem;
   }
 </style>

@@ -180,3 +180,23 @@ blockquote {
   content: '∎';
   float: right;
 }
+
+/* Smooth cross-page navigation (supported browsers fade between pages; others navigate normally). */
+@view-transition {
+  navigation: auto;
+}
+
+/* Scroll-in reveal; skipped entirely for reduced motion or without JavaScript. */
+@media (prefers-reduced-motion: no-preference) {
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .js .reveal.revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
