@@ -5,9 +5,9 @@ export const site = {
   description:
     'Payton Suh is a mathematics student at UCLA interested in analysis, algebra, topology, and probability, and in the connections between mathematics, computer science, and the physical sciences.',
   affiliation: 'Department of Mathematics, UCLA',
-  email: 'TODO@example.com', // TODO: confirm public email
+  email: 'paytonsuh@ucla.edu',
   github: 'https://github.com/verysillytuna',
-  linkedin: 'https://www.linkedin.com/in/TODO', // TODO: LinkedIn URL
+  linkedin: 'https://www.linkedin.com/in/paytonsuh/',
 };
 
 export const nav = [
