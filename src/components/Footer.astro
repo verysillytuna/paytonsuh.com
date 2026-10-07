@@ -1,26 +1,30 @@
 ---
+import Contact from './Contact.astro';
 import { site } from '../site';
 
 const year = new Date().getFullYear();
 ---
 
 <footer>
-  <p>
-    <a href={`mailto:${site.email}`}>Email</a> ·
-    <a href={site.github} rel="me">GitHub</a> ·
-    <a href={site.linkedin} rel="me">LinkedIn</a>
-  </p>
-  <p class="muted">© {year} {site.name}</p>
+  <p class="cta">Get in touch</p>
+  <Contact />
+  <p class="muted small">© {year} {site.name} · Built with Astro, typeset in EB Garamond.</p>
 </footer>
 
 <style>
   footer {
-    margin-top: 4rem;
-    padding: 1.25rem 0 2.5rem;
+    margin-top: 5rem;
+    padding: 1.75rem 0 3rem;
     border-top: 1px solid var(--rule);
-    font-size: 0.9rem;
   }
-  footer p {
-    margin: 0 0 0.25rem;
+  .cta {
+    margin: 0 0 0.6rem;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .small {
+    margin: 1.25rem 0 0;
+    font-size: 0.8rem;
   }
 </style>

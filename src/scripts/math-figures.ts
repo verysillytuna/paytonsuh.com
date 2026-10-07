@@ -655,7 +655,265 @@ const qv: Factory = () => {
   };
 };
 
+// Shared 3D helpers: rotate about y then x, then a light perspective projection.
+function makeView(w: number, h: number, scale: number, yaw: number, pitch: number) {
+  const cy = Math.cos(yaw), sy = Math.sin(yaw), cx = Math.cos(pitch), sx = Math.sin(pitch);
+  return ([x, y, z]: number[]) => {
+    [x, z] = [x * cy + z * sy, -x * sy + z * cy];
+    [y, z] = [y * cx - z * sx, y * sx + z * cx];
+    const k = 4 / (4 - z);
+    return [w / 2 + x * scale * k, h / 2 - y * scale * k, z];
+  };
+}
+
+// Hairy ball theorem: a tangent field on S² (here combed along meridians and twisted) must vanish somewhere.
+const hairyball: Factory = () => {
+  const pts: number[][] = [];
+  const N = 320;
+  for (let i = 0; i < N; i++) {
+    // Fibonacci sphere
+    const z = 1 - (2 * (i + 0.5)) / N, r = Math.sqrt(1 - z * z), phi = i * Math.PI * (3 - Math.sqrt(5));
+    pts.push([r * Math.cos(phi), z, r * Math.sin(phi)]);
+  }
+  let t = 0;
+  return (ctx, w, h, c) => {
+    t += 0.008;
+    const R = h * 0.36, view = makeView(w, h, R, t * 0.5, 0.35 + 0.15 * Math.sin(t * 0.4));
+    const twist = 0.9 * Math.sin(t * 0.6); // blend between combing along meridians and around latitudes
+    ctx.strokeStyle = withAlpha(c.muted, 0.35);
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(w / 2, h / 2, R * (4 / 4), 0, TAU);
+    ctx.stroke();
+    const field = ([x, y, z]: number[]) => {
+      // north pole is +y. e_theta points "south", e_phi points "east"; both scaled by r so the field vanishes at the poles
+      const r = Math.hypot(x, z);
+      if (r < 1e-6) return [0, 0, 0];
+      const eth = [(y * x) / r, -r, (y * z) / r], eph = [-z / r, 0, x / r];
+      const a = Math.cos(twist), b = Math.sin(twist);
+      return eth.map((v, i) => r * (a * v + b * eph[i]));
+    };
+    const hairs = pts.map((p) => {
+      const v = field(p), L = 0.22;
+      const q = p.map((pi, i) => pi + L * v[i]), n = Math.hypot(...q);
+      const mid = p.map((pi, i) => pi + 0.5 * L * v[i]), nm = Math.hypot(...mid);
+      return { a: view(p), m: view(mid.map((x) => x / nm)), b: view(q.map((x) => x / n)) };
+    });
+    hairs.sort((u, v) => u.a[2] - v.a[2]);
+    for (const { a, m, b } of hairs) {
+      const front = (a[2] + 1) / 2;
+      ctx.strokeStyle = withAlpha(c.accent2, 0.15 + 0.7 * front);
+      ctx.lineWidth = 0.6 + 0.9 * front;
+      ctx.beginPath();
+      ctx.moveTo(a[0], a[1]);
+      ctx.quadraticCurveTo(m[0], m[1], b[0], b[1]);
+      ctx.stroke();
+    }
+    for (const pole of [[0, 1, 0], [0, -1, 0]]) {
+      const [px, py, pz] = view(pole);
+      const glow = 3 + 1.5 * Math.sin(t * 4);
+      ctx.fillStyle = withAlpha(c.accent, pz > 0 ? 1 : 0.35);
+      ctx.beginPath();
+      ctx.arc(px, py, glow, 0, TAU);
+      ctx.fill();
+    }
+  };
+};
+
+// A closed cone and the round sphere are the same space: radially push the cone's surface out to S².
+const conesphere: Factory = () => {
+  const apex = 1, base = -0.7, baseR = 0.95;
+  const insideCone = (x: number, y: number, z: number) =>
+    y >= base && y <= apex && Math.hypot(x, z) <= (baseR * (apex - y)) / (apex - base);
+  const coneRadius = (u: number[]) => {
+    // distance along direction u from the centroid-ish origin to the cone boundary (bisection)
+    let lo = 0, hi = 2;
+    for (let i = 0; i < 28; i++) {
+      const mid = (lo + hi) / 2;
+      insideCone(u[0] * mid, u[1] * mid - 0.05, u[2] * mid) ? (lo = mid) : (hi = mid);
+    }
+    return lo;
+  };
+  const lat = 13, lon = 20, seg = 48;
+  const dirs = (th: number, ph: number) => [Math.sin(th) * Math.cos(ph), Math.cos(th), Math.sin(th) * Math.sin(ph)];
+  const cache = new Map<string, number>();
+  const rc = (th: number, ph: number) => {
+    const key = `${th.toFixed(4)},${ph.toFixed(4)}`;
+    let v = cache.get(key);
+    if (v === undefined) cache.set(key, (v = coneRadius(dirs(th, ph))));
+    return v;
+  };
+  let t = 0;
+  return (ctx, w, h, c) => {
+    t += 0.01;
+    const s = 0.5 - 0.5 * Math.cos(t * 0.7);
+    const lam = s * s * (3 - 2 * s); // smoothstep
+    const view = makeView(w, h, h * 0.38, t * 0.45, 0.3);
+    const P = (th: number, ph: number) => {
+      const r = (1 - lam) * rc(th, ph) + lam * 0.85;
+      const d = dirs(th, ph);
+      return view([d[0] * r, d[1] * r - (1 - lam) * 0.05, d[2] * r]);
+    };
+    const curve = (pts: number[][], color: string) => {
+      for (let i = 1; i < pts.length; i++) {
+        const a = pts[i - 1], b = pts[i], depth = ((a[2] + b[2]) / 2 + 1) / 2;
+        ctx.strokeStyle = withAlpha(color, 0.12 + 0.75 * depth);
+        ctx.beginPath();
+        ctx.moveTo(a[0], a[1]);
+        ctx.lineTo(b[0], b[1]);
+        ctx.stroke();
+      }
+    };
+    ctx.lineWidth = 1;
+    for (let i = 1; i < lat; i++) {
+      const th = (i / lat) * Math.PI;
+      curve(Array.from({ length: seg + 1 }, (_, k) => P(th, (k / seg) * TAU)), c.accent2);
+    }
+    for (let j = 0; j < lon; j++) {
+      const ph = (j / lon) * TAU;
+      curve(Array.from({ length: seg + 1 }, (_, k) => P((k / seg) * Math.PI, ph)), c.accent);
+    }
+    ctx.font = 'italic 14px "EB Garamond", serif';
+    ctx.fillStyle = withAlpha(c.fg, 0.25 + 0.75 * (1 - lam));
+    ctx.fillText('cone', 8, h - 10);
+    ctx.fillStyle = c.muted;
+    ctx.fillText('≅', 40, h - 10);
+    ctx.fillStyle = withAlpha(c.fg, 0.25 + 0.75 * lam);
+    ctx.fillText('sphere', 56, h - 10);
+  };
+};
+
+// Monte Carlo estimate of π: uniform points in the unit square, counted inside the quarter disc.
+const montecarlo: Factory = () => {
+  const max = 5000;
+  let pts: [number, number, boolean][] = [], inside = 0, hold = 0;
+  const history: number[] = [];
+  return (ctx, w, h, c) => {
+    if (pts.length < max) {
+      for (let i = 0; i < 12; i++) {
+        const x = Math.random(), y = Math.random(), inn = x * x + y * y <= 1;
+        pts.push([x, y, inn]);
+        if (inn) inside++;
+      }
+      history.push((4 * inside) / pts.length);
+    } else if (++hold > 150) {
+      pts = [];
+      inside = 0;
+      hold = 0;
+      history.length = 0;
+    }
+    const S = h - 16, x0 = 8, y0 = 8;
+    ctx.strokeStyle = c.rule;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x0, y0, S, S);
+    ctx.beginPath();
+    ctx.arc(x0, y0 + S, S, -Math.PI / 2, 0);
+    ctx.strokeStyle = c.muted;
+    ctx.stroke();
+    for (const [x, y, inn] of pts) {
+      ctx.fillStyle = inn ? withAlpha(c.accent, 0.7) : withAlpha(c.accent2, 0.6);
+      ctx.fillRect(x0 + x * S - 0.75, y0 + S - y * S - 0.75, 1.5, 1.5);
+    }
+    // convergence of the estimate toward π
+    const px = x0 + S + 18, pw = w - px - 8;
+    if (pw < 40) return;
+    const yOf = (v: number) => y0 + S / 2 - (v - Math.PI) * (S / 1.2);
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = c.muted;
+    ctx.beginPath();
+    ctx.moveTo(px, yOf(Math.PI));
+    ctx.lineTo(px + pw, yOf(Math.PI));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.strokeStyle = c.accent;
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    history.forEach((v, i) => {
+      const x = px + (i / (max / 12)) * pw, y = Math.min(y0 + S, Math.max(y0, yOf(v)));
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    });
+    ctx.stroke();
+    ctx.fillStyle = c.fg;
+    ctx.font = 'italic 14px "EB Garamond", serif';
+    const est = history.length ? history[history.length - 1] : 0;
+    ctx.textAlign = 'right';
+    ctx.fillText(`π ≈ ${est.toFixed(4)}`, px + pw, y0 + S - 20);
+    ctx.fillStyle = c.muted;
+    ctx.font = 'italic 12px "EB Garamond", serif';
+    ctx.fillText(`n = ${pts.length}`, px + pw, y0 + S - 4);
+    ctx.textAlign = 'left';
+  };
+};
+
+// The doubling ("martingale") betting strategy on a fair coin: wealth is still a martingale.
+const martingale: Factory = () => {
+  const G = 60, bank = 255, rounds = 360;
+  type Gambler = { w: number[]; stake: number; ruined: boolean };
+  let gs: Gambler[] = [], step = 0, hold = 0;
+  const reset = () => {
+    gs = Array.from({ length: G }, () => ({ w: [bank], stake: 1, ruined: false }));
+    step = 0;
+    hold = 0;
+  };
+  reset();
+  return (ctx, w, h, c) => {
+    if (step < rounds) {
+      for (let k = 0; k < 2 && step < rounds; k++, step++)
+        for (const g of gs) {
+          const cur = g.w[g.w.length - 1];
+          if (g.ruined || g.stake > cur) {
+            g.ruined = true;
+            g.w.push(cur);
+            continue;
+          }
+          if (Math.random() < 0.5) {
+            g.w.push(cur + g.stake);
+            g.stake = 1;
+          } else {
+            g.w.push(cur - g.stake);
+            g.stake *= 2;
+          }
+        }
+    } else if (++hold > 160) reset();
+    const x0 = 6, pw = w - 12, top = 18, bot = h - 8, yMax = bank + rounds / 2 + 20;
+    const yOf = (v: number) => bot - (v / yMax) * (bot - top);
+    const xOf = (i: number) => x0 + (i / rounds) * pw;
+    ctx.strokeStyle = c.rule;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(x0, yOf(bank));
+    ctx.lineTo(x0 + pw, yOf(bank));
+    ctx.stroke();
+    ctx.setLineDash([]);
+    for (const g of gs) {
+      ctx.strokeStyle = g.ruined ? withAlpha(c.earth, 0.45) : withAlpha(c.accent2, 0.35);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      g.w.forEach((v, i) => (i ? ctx.lineTo(xOf(i), yOf(v)) : ctx.moveTo(xOf(0), yOf(v))));
+      ctx.stroke();
+    }
+    // sample mean wealth
+    ctx.strokeStyle = c.accent;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    for (let i = 0; i <= step; i++) {
+      let m = 0;
+      for (const g of gs) m += g.w[Math.min(i, g.w.length - 1)];
+      m /= G;
+      i ? ctx.lineTo(xOf(i), yOf(m)) : ctx.moveTo(xOf(0), yOf(m));
+    }
+    ctx.stroke();
+    const ruined = gs.filter((g) => g.ruined).length;
+    ctx.fillStyle = c.muted;
+    ctx.font = 'italic 12px "EB Garamond", serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`ruined: ${ruined} of ${G}`, x0 + pw, top - 5);
+    ctx.textAlign = 'left';
+  };
+};
+
 const factories: Record<string, Factory> = {
+  hairyball, conesphere, montecarlo, martingale,
   lorenz, brownian, fourier, torus, perspective, lattice, conformal, flow, mobius, hopf, gbm, qv,
 };
 

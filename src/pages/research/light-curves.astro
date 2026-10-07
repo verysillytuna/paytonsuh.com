@@ -21,7 +21,7 @@ const centroid = katex.renderToString(
 >
   <p class="crumb"><a href="/research/">← Research</a></p>
   <h1>Stellar Light Curves</h1>
-  <p class="muted subtitle">Astrophysics · TESS data · 2025–June 2026</p>
+  <p class="muted subtitle">Astrophysics · TESS data · October 2025–June 2026</p>
 
   <p>
     Working directly with data from NASA’s TESS satellite, I built a pipeline to
@@ -74,16 +74,16 @@ const centroid = katex.renderToString(
         label: 'Flare detection',
         code: pipeline,
         summary:
-          'Loads a TESS Target Pixel File, builds an aperture-masked light curve, finds the brightest cadence, computes flux-weighted centroids at every cadence, and measures the centroid shift between baseline and peak.',
-        tools: ['lightkurve', 'astropy', 'numpy', 'TESS TPF', 'WCS'],
+          'For one target: build an aperture-masked light curve, detrend it and flag flares as runs of points above 3σ of the robust noise, compute flux-weighted centroids at every cadence, and test whether the centroid moves significantly, and toward or away from the target, during the strongest flare. Ends with a verdict and a diagnostic figure.',
+        tools: ['lightkurve', 'astropy', 'numpy', 'matplotlib', 'TESS TPF', 'WCS'],
       },
       {
         name: 'scanning.py',
         label: 'NGC 2516 survey',
         code: scanning,
         summary:
-          'A planned extension to a whole open cluster: query Gaia DR3 for NGC 2516 members by parallax and proper motion, cross-match to the TESS Input Catalog, then download and stitch light curves for automated variability and anomaly detection.',
-        tools: ['astroquery', 'lightkurve', 'Gaia DR3', 'TESS TIC', 'pandas'],
+          'The same idea scaled to a whole open cluster: select NGC 2516 members from Gaia DR3 by parallax and proper motion, cross-match to the TESS Input Catalog, download and stitch every light curve, extract variability features (amplitude, skewness, von Neumann ratio, Lomb–Scargle period, flare count), and rank stars with an Isolation Forest.',
+        tools: ['astroquery', 'lightkurve', 'Gaia DR3', 'TESS TIC', 'pandas', 'scipy', 'scikit-learn'],
       },
     ]}
   />

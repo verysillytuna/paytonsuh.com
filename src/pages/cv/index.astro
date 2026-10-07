@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import CvBody from '../../components/CvBody.astro';
+import Resume from '../../components/Resume.astro';
 import MathFigure from '../../components/MathFigure.astro';
 ---
 
@@ -17,12 +17,12 @@ import MathFigure from '../../components/MathFigure.astro';
   </div>
 
   <div class="paper-stack" data-cv aria-label="CV">
-    <noscript><CvBody /></noscript>
+    <noscript><Resume /></noscript>
   </div>
 
   <details class="text">
     <summary>Read as plain text</summary>
-    <CvBody />
+    <Resume />
   </details>
 </Base>
 

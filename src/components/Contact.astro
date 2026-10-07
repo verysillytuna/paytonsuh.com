@@ -1,0 +1,55 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../site';
+
+interface Props {
+  variant?: 'row' | 'compact';
+}
+const { variant = 'row' } = Astro.props;
+const handle = site.linkedin.replace(/\/$/, '').split('/').pop();
+---
+
+<ul class:list={['contact', variant]}>
+  <li>
+    <a href={`mailto:${site.email}`}><Icon name="mail" /><span>{site.email}</span></a>
+  </li>
+  <li>
+    <a href={site.github} rel="me"><Icon name="github" /><span>{variant === 'row' ? 'verysillytuna' : 'GitHub'}</span></a>
+  </li>
+  <li>
+    <a href={site.linkedin} rel="me"><Icon name="linkedin" /><span>{variant === 'row' ? handle : 'LinkedIn'}</span></a>
+  </li>
+</ul>
+
+<style>
+  .contact {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+  }
+  .contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 0.92rem;
+    transition: color 0.2s;
+  }
+  .contact a span {
+    border-bottom: 1px solid var(--rule);
+    transition: border-color 0.2s;
+  }
+  .contact a:hover {
+    color: var(--accent);
+  }
+  .contact a:hover span {
+    border-color: var(--accent);
+  }
+  .contact :global(.icon) {
+    color: var(--accent);
+  }
+</style>

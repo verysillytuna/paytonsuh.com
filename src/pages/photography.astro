@@ -25,17 +25,20 @@ const items = photos.map((p) => {
   <div class="collage">
     {
       items.map((p, i) => (
-        <figure style={`--r:${(p.src.width / p.src.height).toFixed(4)}`}>
+        <figure>
           <a href={p.src.src} data-index={i} aria-label={`Open: ${p.caption}`}>
             <Image
               src={p.src}
               alt={p.caption}
               widths={[480, 960, 1440]}
-              sizes="(max-width: 40rem) 100vw, 480px"
+              sizes="(max-width: 40rem) 100vw, 420px"
               loading={i < 6 ? 'eager' : 'lazy'}
             />
-            <figcaption>{p.caption}</figcaption>
           </a>
+          <figcaption>
+            <span class="no">{String(i + 1).padStart(2, '0')}</span>
+            {p.caption}
+          </figcaption>
         </figure>
       ))
     }
@@ -88,71 +91,54 @@ const items = photos.map((p) => {
 
 <style>
   .collage {
-    /* Justified rows: each photo grows in proportion to its aspect ratio --r, so every row shares one height. */
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    /* Masonry columns; photos keep their own proportions. */
     --w: min(68rem, calc(100vw - 2rem));
     width: var(--w);
-    margin: 2rem 0 0 calc((100% - var(--w)) / 2);
-  }
-  .collage::after {
-    /* keeps the last row from stretching */
-    content: '';
-    flex-grow: 999;
+    margin: 2.5rem 0 0 calc((100% - var(--w)) / 2);
+    columns: 3 18rem;
+    column-gap: 1.25rem;
   }
   figure {
-    flex: var(--r) 1 calc(var(--r) * 13rem);
-    margin: 0;
-    overflow: hidden;
-    position: relative;
+    break-inside: avoid;
+    margin: 0 0 1.75rem;
   }
   figure a {
     display: block;
-    height: 100%;
+    overflow: hidden;
+    border-radius: 2px;
+    background: var(--code-bg);
   }
   figure img {
     display: block;
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
     transition:
-      transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
-      filter 0.4s;
+      transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1),
+      filter 0.5s;
+    filter: saturate(0.92);
   }
-  figure figcaption {
-    position: absolute;
-    inset: auto 0 0 0;
-    padding: 1.5rem 0.6rem 0.45rem;
-    font-size: 0.8rem;
-    font-style: italic;
-    color: #f6f4ef;
-    background: linear-gradient(transparent, rgb(22 25 32 / 0.75));
-    opacity: 0;
-    transform: translateY(6px);
-    transition:
-      opacity 0.35s,
-      transform 0.35s;
-  }
-  figure:hover img,
+  figure a:hover img,
   figure a:focus-visible img {
-    transform: scale(1.035);
+    transform: scale(1.04);
+    filter: saturate(1.05);
   }
-  figure:hover figcaption,
-  figure a:focus-visible figcaption {
-    opacity: 1;
-    transform: none;
+  figcaption {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    font-style: italic;
+    color: var(--muted);
   }
-  @media (hover: none) {
-    figure figcaption {
-      opacity: 1;
-      transform: none;
-    }
-  }
-  @media (max-width: 30rem) {
-    figure {
-      flex-basis: calc(var(--r) * 9rem);
-    }
+  .no {
+    font-style: normal;
+    font-variant-numeric: lining-nums tabular-nums;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    border-top: 1px solid var(--accent);
+    padding-top: 0.1rem;
   }
 
   .lightbox {
@@ -207,6 +193,8 @@ const items = photos.map((p) => {
     transform: none;
   }
   .lightbox figcaption {
+    display: block;
+    color: #e8e5de;
     position: static;
     margin-top: 0.75rem;
     padding: 0;

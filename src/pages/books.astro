@@ -1,0 +1,192 @@
+---
+import Base from '../layouts/Base.astro';
+import { shelves } from '../data/books';
+
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Spine colours cycle through the palette; heights vary a little like a real shelf.
+const tones = ['var(--accent)', 'var(--accent-2)', 'var(--fg)', 'var(--earth)', 'var(--muted)'];
+const count = shelves.reduce((n, s) => n + s.books.length, 0);
+---
+
+<Base title="Books" description="The textbooks on Payton Suh’s shelf, from analysis to quantitative finance.">
+  <h1>Books</h1>
+  <p class="muted">
+    {count} books across mathematics, probability, physics, chemistry, and engineering: the ones I am
+    reading now and the ones that got me here. Hover a spine; click it for details.
+  </p>
+
+  {
+    shelves.map((shelf, si) => (
+      <section class="shelf-section">
+        <h2>{shelf.subject}</h2>
+        <div class="shelf" role="list">
+          {shelf.books.map((b, bi) => {
+            const id = slug(b.title + '-' + b.authors.split(/[ ,&]/)[0]);
+            const tone = tones[(si * 2 + bi) % tones.length];
+            const thick = Math.round(26 + Math.min(1450, b.pages) / 30);
+            const tall = 150 + ((bi * 37 + si * 13) % 5) * 9;
+            return (
+              <a
+                role="listitem"
+                class:list={['spine', { current: b.current }]}
+                href={`#${id}`}
+                style={`--tone:${tone};--thick:${thick}px;--tall:${tall}px`}
+                title={`${b.title} — ${b.authors}`}
+              >
+                <span class="spine-title">{b.title}</span>
+                <span class="spine-author">{b.authors.split(/,|&/)[0].trim().split(' ').pop()}</span>
+              </a>
+            );
+          })}
+        </div>
+        <ol class="details">
+          {shelf.books.map((b) => {
+            const id = slug(b.title + '-' + b.authors.split(/[ ,&]/)[0]);
+            return (
+              <li id={id}>
+                <p class="title">
+                  {b.href ? <a href={b.href}><cite>{b.title}</cite></a> : <cite>{b.title}</cite>}
+                  {b.subtitle && <span class="muted">: {b.subtitle}</span>}
+                  {b.current && <span class="badge">reading now</span>}
+                </p>
+                <p class="meta">
+                  {b.authors}
+                  {(b.edition || b.year) && <span class="muted"> · {[b.edition, b.year].filter(Boolean).join(', ')}</span>}
+                </p>
+                {b.note && <p class="note">{b.note}</p>}
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .shelf-section {
+    margin-top: 2.5rem;
+  }
+  .shelf {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    min-height: 210px;
+    padding: 0 0.5rem;
+    border-bottom: 6px solid var(--earth);
+    box-shadow: 0 6px 0 -3px color-mix(in srgb, var(--earth) 55%, transparent);
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+  }
+  .spine {
+    position: relative;
+    flex: none;
+    width: var(--thick);
+    height: var(--tall);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0 0.5rem;
+    background: var(--tone);
+    color: var(--bg);
+    text-decoration: none;
+    border-radius: 2px 2px 0 0;
+    box-shadow:
+      inset 3px 0 0 rgb(255 255 255 / 0.12),
+      inset -3px 0 0 rgb(0 0 0 / 0.14);
+    transform-origin: bottom center;
+    transition:
+      transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+      filter 0.35s;
+  }
+  .spine::before,
+  .spine::after {
+    /* gilt bands */
+    content: '';
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    height: 1px;
+    background: rgb(255 255 255 / 0.4);
+  }
+  .spine::before {
+    top: 0.35rem;
+  }
+  .spine::after {
+    bottom: 1.9rem;
+  }
+  .spine:hover,
+  .spine:focus-visible {
+    transform: translateY(-10px);
+    filter: brightness(1.1);
+  }
+  .spine.current {
+    outline: 1px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .spine-title {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    font-size: 0.78rem;
+    line-height: 1.05;
+    max-height: calc(var(--tall) - 3.2rem);
+    overflow: hidden;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+  .spine-author {
+    font-size: 0.55rem;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+    max-width: calc(var(--thick) - 4px);
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0.85;
+  }
+  .details {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+  .details li {
+    padding-left: 0.8rem;
+    border-left: 2px solid transparent;
+    transition:
+      border-color 0.3s,
+      background 0.6s;
+    scroll-margin-top: 30vh;
+  }
+  .details li:target {
+    border-left-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+  .details p {
+    margin: 0;
+  }
+  .title cite {
+    font-style: italic;
+    font-size: 1.05rem;
+  }
+  .meta {
+    font-size: 0.92rem;
+  }
+  .note {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .badge {
+    white-space: nowrap;
+    margin-left: 0.5rem;
+    font-size: 0.68rem;
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 0 0.35rem;
+    vertical-align: 0.15em;
+  }
+</style>

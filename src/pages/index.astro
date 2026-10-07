@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import { site } from '../site';
 import MathFigure from '../components/MathFigure.astro';
+import Contact from '../components/Contact.astro';
 import portrait from '../assets/portrait.jpg';
 
 const recent = (await getCollection('notes', ({ data }) => !data.draft))
@@ -16,7 +17,8 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     <canvas class="hero-flow" data-math-figure="flow" aria-hidden="true"></canvas>
     <div>
       <h1>{site.name}</h1>
-      <p class="muted">Mathematics · UCLA</p>
+      <p class="muted role">Mathematics · UCLA</p>
+      <Contact />
     </div>
     <figure class="portrait">
       <Image src={portrait} alt={`Portrait of ${site.name}`} width={180} densities={[1, 2]} loading="eager" />
@@ -46,15 +48,15 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
     Outside of coursework, I am a co-investigator on ZrC-ARC, a NASA
     L’SPACE–funded project on refractory coatings for hypersonic and nuclear
     thermal propulsion. I was its principal investigator from January to
-    October 2026 and now lead its research and LAMMPS simulation work, and I tutor physics and chemistry. Until June 2026 I
-    analyzed stellar light curves for variable stars. See
-    <a href="/research/">Research</a>.
+    October 2026 and now lead its research and LAMMPS simulation work. I also
+    tutor physics and chemistry, and from October 2025 to June 2026 I analyzed
+    stellar light curves for variable stars. See <a href="/research/">Research</a>.
   </p>
   <p>
-    I am into photography, mostly streets, stations, and temples, and drawn to
-    lines that converge and forms that repeat; some of it is
-    <a href="/photography/">here</a>. Away from the desk I also boulder (up to
-    V7), play pool (8-ball and 9-ball), and cook.
+    I am into photography, drawn to lines that converge and forms that repeat;
+    some of it is <a href="/photography/">here</a>. Away from the desk I climb
+    three or more times a week (bouldering up to V7), play pool at least four
+    times a week (8-ball and 9-ball), and cook.
   </p>
 
   <MathFigure
@@ -65,10 +67,13 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
 
   <h2>Things I think about</h2>
   <div class="figures">
-    <MathFigure kind="mobius" caption="<b>Möbius strip.</b> Carry a normal vector once around and it returns pointing the other way: the surface is non-orientable." height={170} />
-    <MathFigure kind="hopf" caption="<b>Hopf fibration.</b> <i>S</i><sup>3</sup> as a bundle of circles over <i>S</i><sup>2</sup>; any two fibres are linked." height={170} />
-    <MathFigure kind="gbm" caption="<b>Geometric Brownian motion.</b> d<i>S</i> = μ<i>S</i> d<i>t</i> + σ<i>S</i> d<i>W</i>; terminal prices pile up into a lognormal law." height={170} />
-    <MathFigure kind="qv" caption="<b>Quadratic variation.</b> Σ(Δ<i>W</i>)² over finer partitions converges to <i>t</i>: the reason Itô’s formula has a second-order term." height={170} />
+    <div class="feature">
+      <MathFigure kind="gbm" caption="<b>Brownian motion.</b> Geometric Brownian motion d<i>S</i> = μ<i>S</i> d<i>t</i> + σ<i>S</i> d<i>W</i>; terminal values pile up into a lognormal law." height={190} />
+    </div>
+    <MathFigure kind="hairyball" caption="<b>Hairy ball theorem.</b> Every continuous tangent vector field on <i>S</i><sup>2</sup> vanishes somewhere: you cannot comb a hairy ball flat." height={180} />
+    <MathFigure kind="conesphere" caption="<b>A cone is a sphere.</b> Round the apex and inflate: the closed cone is homeomorphic to <i>S</i><sup>2</sup>. Topology forgets corners." height={180} />
+    <MathFigure kind="montecarlo" caption="<b>Monte Carlo.</b> The fraction of random points landing in the quarter disc estimates π/4, with error shrinking like 1/√<i>n</i>." height={180} />
+    <MathFigure kind="martingale" caption="<b>The martingale bet.</b> Double the stake after every loss. Most gamblers (blue) creep upward, a few (brown) are wiped out, and the average (burgundy) stays at the starting bankroll, as optional stopping demands." height={180} />
   </div>
 
   <h2>Currently</h2>
@@ -86,14 +91,13 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
   <h3>Reading</h3>
   <ul>
     <li>Walter Rudin, <cite>Principles of Mathematical Analysis</cite></li>
-    <li>
-      Friedberg, Insel &amp; Spence, <cite>Linear Algebra</cite>, 5th ed.
-    </li>
+    <li>Friedberg, Insel &amp; Spence, <cite>Linear Algebra</cite>, 5th ed.</li>
     <li>
       Richard Elman,
       <a href="https://www.math.ucla.edu/~rse/algebra_book.pdf"><cite>Lectures on Abstract Algebra</cite></a>
     </li>
   </ul>
+  <p>The rest of my shelf is on the <a href="/books/">Books</a> page.</p>
 
   {
     recent.length > 0 && (
@@ -142,7 +146,13 @@ const recent = (await getCollection('notes', ({ data }) => !data.draft))
   .figures {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-    gap: 0 1.5rem;
+    gap: 0.5rem 1.75rem;
+  }
+  .feature {
+    grid-column: 1 / -1;
+  }
+  .role {
+    margin: 0.15rem 0 0.9rem;
   }
   .figures :global(figcaption) {
     text-align: left;
