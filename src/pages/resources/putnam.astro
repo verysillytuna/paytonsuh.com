@@ -1,0 +1,175 @@
+---
+import Base from '../../layouts/Base.astro';
+import csv from '../../data/putnam-bank.csv?raw';
+
+// bank.csv is generated in the workbench repo (putnam/tools/build_bank.py); no field contains a comma.
+const [, ...lines] = csv.trim().split('\n');
+const problems = lines.map((line) => {
+  const [id, year, label, band, topics] = line.split(',');
+  return { id, year: Number(year), label, band, topics: topics ? topics.split(';') : [] };
+});
+const topics = ['algebra', 'analysis', 'number-theory', 'combinatorics', 'geometry', 'probability'];
+const years = [...new Set(problems.map((p) => p.year))].sort((a, b) => b - a);
+const archive = (y: number, s = '') => `https://kskedlaya.org/putnam-archive/${y}${s}.pdf`;
+---
+
+<Base title="Putnam Practice Bank" description="Every Putnam problem from 1985 to 2025, sorted by topic and difficulty, with links to the Putnam Archive.">
+  <h1>Putnam Practice Bank</h1>
+  <p class="muted">{problems.length} problems · {years.at(-1)}–{years[0]}</p>
+
+  <p>
+    Every problem from the William Lowell Putnam Competition since {years.at(-1)}, filterable by topic and difficulty.
+    Each label links to that year's problems in Kiran Kedlaya's
+    <a href="https://kskedlaya.org/putnam-archive/">Putnam Archive</a>; solutions are one click further. No statements
+    or solutions are copied here.
+  </p>
+  <p class="muted small">
+    Difficulty comes from position (1–2 entry, 3–4 middle, 5–6 hard), a rough guide only. Topics are from
+    <a href="https://github.com/trishullab/PutnamBench">PutnamBench</a>; problems it doesn't include are untagged.
+    From 2026 the exam is four 90-minute sessions of three problems, so a good mock is three problems in 90 minutes.
+  </p>
+
+  <form id="filters" class="filters">
+    <label>Topic
+      <select name="topic">
+        <option value="">All</option>
+        {topics.map((t) => <option value={t}>{t.replace('-', ' ')}</option>)}
+        <option value="untagged">untagged</option>
+      </select>
+    </label>
+    <label>Difficulty
+      <select name="band">
+        <option value="">All</option>
+        <option value="entry">Entry (1–2)</option>
+        <option value="middle">Middle (3–4)</option>
+        <option value="hard">Hard (5–6)</option>
+      </select>
+    </label>
+    <label>From <select name="from">{years.slice().reverse().map((y) => <option>{y}</option>)}</select></label>
+    <button type="button" id="pick">Pick 3 at random</button>
+  </form>
+
+  <div>
+    <p id="picked" class="picked" hidden></p>
+    <p id="count" class="muted small" aria-live="polite"></p>
+  </div>
+
+  <ul class="bank" id="bank">
+    {
+      problems.map((p) => (
+        <li data-topics={p.topics.join(' ') || 'untagged'} data-band={p.band} data-year={p.year}>
+          <a href={archive(p.year)}>{p.id}</a>
+          <a class="sol" href={archive(p.year, 's')} title={`Solutions to ${p.year}`}>sol</a>
+          <span class="t">{p.band} · {p.topics.join(', ') || 'untagged'}</span>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<script>
+  const form = document.getElementById('filters') as HTMLFormElement;
+  const items = [...document.querySelectorAll<HTMLLIElement>('#bank li')];
+  const count = document.getElementById('count')!;
+  const picked = document.getElementById('picked')!;
+
+  const visible = () => items.filter((li) => !li.hidden);
+  function apply() {
+    const f = new FormData(form);
+    const topic = String(f.get('topic') ?? '');
+    const band = String(f.get('band') ?? '');
+    const from = Number(f.get('from'));
+    for (const li of items) {
+      const d = li.dataset;
+      li.hidden =
+        (topic !== '' && !d.topics!.split(' ').includes(topic)) ||
+        (band !== '' && d.band !== band) ||
+        Number(d.year) < from;
+    }
+    count.textContent = `${visible().length} problems shown`;
+    picked.hidden = true;
+  }
+  form.addEventListener('change', apply);
+  document.getElementById('pick')!.addEventListener('click', () => {
+    const pool = visible();
+    const set: HTMLLIElement[] = [];
+    while (set.length < Math.min(3, pool.length)) {
+      const li = pool[Math.floor(Math.random() * pool.length)];
+      if (!set.includes(li)) set.push(li);
+    }
+    picked.replaceChildren('Your set: ');
+    set.forEach((li, i) => {
+      if (i) picked.append(', ');
+      picked.append(li.querySelector('a')!.cloneNode(true));
+    });
+    picked.append(set.length ? '. Ninety minutes, no notes.' : 'nothing matches these filters.');
+    picked.hidden = false;
+  });
+  apply();
+</script>
+
+<style>
+  .small {
+    font-size: 0.9rem;
+  }
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1.2rem;
+    align-items: end;
+    margin: 1.5rem 0 0.5rem;
+    font-size: 0.92rem;
+  }
+  .filters label {
+    display: grid;
+    gap: 0.15rem;
+    color: var(--muted);
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+  }
+  select,
+  button {
+    font: inherit;
+    font-variant: normal;
+    color: var(--fg);
+    background: var(--bg);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+  }
+  button {
+    cursor: pointer;
+    color: var(--accent);
+  }
+  button:hover {
+    border-color: var(--accent);
+  }
+  .picked {
+    padding: 0.7rem 1rem;
+    background: var(--tint-rose);
+    border-left: 2px solid var(--accent);
+  }
+  .bank {
+    list-style: none;
+    padding: 0;
+    columns: 15rem;
+    column-gap: 2rem;
+    font-size: 0.92rem;
+  }
+  .bank li {
+    break-inside: avoid;
+    padding: 0.12rem 0;
+  }
+  .bank li[hidden] {
+    display: none;
+  }
+  .sol {
+    font-size: 0.8rem;
+    margin-left: 0.3rem;
+  }
+  .t {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+</style>

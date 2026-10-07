@@ -1,0 +1,71 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Resources" description="Free tools for mathematics undergraduates: a Putnam practice bank, a list of summer research programs, and a LaTeX notes template.">
+  <h1>Resources</h1>
+  <p class="muted">Things I built for my own preparation that may help other mathematics undergraduates.</p>
+
+  <a class="featured" href="/resources/putnam/">
+    <span class="tag">Practice · 492 problems</span>
+    <span class="ftitle">Putnam Practice Bank</span>
+    <span class="fdesc">Every Putnam problem from 1985 to 2025, sorted by topic and difficulty, with links to the Putnam Archive and a random set picker.</span>
+  </a>
+
+  <a class="featured" href="/resources/summer-programs/">
+    <span class="tag">Opportunities · by deadline</span>
+    <span class="ftitle">Summer Research Programs</span>
+    <span class="fdesc">REUs, summer schools, and counselor jobs for math undergraduates, with stipends, last deadlines, and which programs don't take outside students.</span>
+  </a>
+
+  <div class="featured static">
+    <span class="tag">LaTeX · template</span>
+    <span class="ftitle">Lecture Notes Template</span>
+    <span class="fdesc">
+      A clean article-style preamble for typesetting class notes: amsthm environments, numbered equations, nested
+      lists, boxed tables. Compiles with pdflatex or Tectonic.
+    </span>
+    <span class="links">
+      <a href="/resources/latex-notes-template.zip" download>Download (.zip)</a> ·
+      <a href="/resources/latex/main.tex">main.tex</a> ·
+      <a href="/resources/latex/preamble.tex">preamble.tex</a> ·
+      <a href="/resources/latex/sample.pdf">sample PDF</a>
+    </span>
+  </div>
+</Base>
+
+<style>
+  .featured {
+    display: grid;
+    gap: 0.2rem;
+    margin: 1.5rem 0;
+    padding: 1rem 1.1rem;
+    background: var(--tint-denim);
+    border-left: 2px solid color-mix(in srgb, var(--accent-2) 60%, transparent);
+    color: var(--fg);
+    text-decoration: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  a.featured:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 26px -18px rgb(30 34 48 / 0.5);
+  }
+  .tag {
+    font-size: 0.75rem;
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: var(--accent-2);
+  }
+  .ftitle {
+    font-size: 1.25rem;
+    color: var(--accent);
+  }
+  .fdesc {
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+  .links {
+    font-size: 0.92rem;
+    margin-top: 0.3rem;
+  }
+</style>
