@@ -7,6 +7,17 @@ const isActive = (href: string) =>
   href === '/' ? path === '/' : path.startsWith(href);
 ---
 
+<div class="topbar">
+  <a href={`mailto:${site.email}`}>{site.email}</a>
+  <span class="links">
+    <a href="/cv.pdf">CV (PDF)</a>
+    <a href={site.github}>GitHub</a>
+    <a href={site.linkedin}>LinkedIn</a>
+    <a href="/resources/putnam/">Putnam bank</a>
+    <a href="/admin/">Admin</a>
+  </span>
+</div>
+
 <header>
   <a class="name" href="/"><span class="mark" aria-hidden="true"><svg viewBox="0 0 64 64"><path d={phi} /></svg></span>{site.name}</a>
   <nav aria-label="Main">
@@ -38,6 +49,27 @@ const isActive = (href: string) =>
 </script>
 
 <style>
+  .topbar {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.2rem 1rem;
+    padding-top: 0.6rem;
+    font-size: 0.8rem;
+  }
+  .topbar .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.9rem;
+  }
+  .topbar a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+  .topbar a:hover {
+    color: var(--accent-hover);
+  }
   header {
     display: flex;
     flex-wrap: wrap;
