@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import MathFigure from '../../components/MathFigure.astro';
+import { getCollection } from 'astro:content';
+
+const entries = (await getCollection('digest', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
+---
+
+<Base title="Digest" description="A short daily digest of notable news in mathematics, with links to the papers.">
+  <h1>Digest</h1>
+  <p class="muted">
+    A quick daily read on what happened in mathematics: new results, claims worth watching, and where to read more.
+    Claims are reported as claims until the community has checked them. Entries are drafted with an AI assistant
+    from the linked sources and reviewed by me before they go up.
+  </p>
+
+  <MathFigure kind="lorenz" caption="The Lorenz attractor: a deterministic system that never repeats a day." />
+
+  {entries.length === 0 && <p class="muted">No entries yet.</p>}
+  <ul>
+    {
+      entries.map((e) => (
+        <li>
+          <span class="date">{fmt(e.data.date)}</span>
+          <a href={`/digest/${e.id}/`}>{e.data.title}</a>
+          <p class="summary">{e.data.summary}</p>
+        </li>
+      ))
+    }
+  </ul>
+</Base>
+
+<style>
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    margin: 1.4rem 0;
+  }
+  .date {
+    display: block;
+    font-size: 0.78rem;
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: var(--accent-2);
+  }
+  .summary {
+    margin: 0.15rem 0 0;
+  }
+</style>
