@@ -4,6 +4,20 @@ import Base from '../../layouts/Base.astro';
 // The vault exists only after `npm run admin:seal`; without it the page explains how to set it up.
 const found = import.meta.glob('../../data/admin-vault.json', { eager: true, import: 'default' });
 const vault = Object.values(found)[0] ?? null;
+
+const tabs = [
+  { id: 'overview', label: 'Overview', counted: false },
+  { id: 'asks', label: 'Your asks', counted: true },
+  { id: 'inbox', label: 'Inbox', counted: true },
+  { id: 'prs', label: 'Pull requests', counted: true },
+  { id: 'other', label: 'Other issues', counted: true },
+  { id: 'opps', label: 'Opportunities', counted: true },
+  { id: 'backlog', label: 'Backlog', counted: true },
+  { id: 'projects', label: 'Projects', counted: true },
+  { id: 'journal', label: 'Journal', counted: false },
+  { id: 'repos', label: 'Repos', counted: true },
+  { id: 'claude', label: 'Claude', counted: false },
+];
 ---
 
 <Base title="Admin" description="Private." noindex>
@@ -44,22 +58,64 @@ const vault = Object.values(found)[0] ?? null;
       </form>
     </details>
 
-    <h2>Your asks</h2>
-    <ul id="asks" class="list"></ul>
-    <h2>Inbox</h2>
-    <ul id="inbox" class="list"></ul>
-    <h2>Open pull requests</h2>
-    <ul id="prs" class="list"></ul>
-    <h2>Other open issues</h2>
-    <ul id="other" class="list"></ul>
-    <h2>Opportunities</h2>
-    <div class="scroll"><table id="opps"></table></div>
-    <h2>Backlog: Now</h2>
-    <ol id="backlog"></ol>
-    <h2>Projects</h2>
-    <div id="projects"></div>
-    <h2 id="journal-title">Latest journal</h2>
-    <pre id="journal" class="journal"></pre>
+    <div class="tabs" role="tablist" aria-label="Dashboard sections">
+      {
+        tabs.map((t, i) => (
+          <button type="button" role="tab" id={`tab-${t.id}`} aria-controls={`panel-${t.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1} data-tab={t.id}>
+            {t.label}
+            {t.counted && <span class="count" data-count={t.id} />}
+          </button>
+        ))
+      }
+    </div>
+
+    <section role="tabpanel" id="panel-overview" aria-labelledby="tab-overview" data-panel="overview">
+      <ul id="overview" class="overview"></ul>
+      <p class="muted small" id="next-run"></p>
+    </section>
+    <section role="tabpanel" id="panel-asks" aria-labelledby="tab-asks" data-panel="asks" hidden>
+      <p class="muted small">Open <code>for-payton</code> issues: things only you can do.</p>
+      <ul id="asks" class="list"></ul>
+    </section>
+    <section role="tabpanel" id="panel-inbox" aria-labelledby="tab-inbox" data-panel="inbox" hidden>
+      <p class="muted small">Open <code>daily</code> and <code>task</code> issues in both repositories.</p>
+      <ul id="inbox" class="list"></ul>
+    </section>
+    <section role="tabpanel" id="panel-prs" aria-labelledby="tab-prs" data-panel="prs" hidden>
+      <p class="muted small">Pull requests waiting for your review.</p>
+      <ul id="prs" class="list"></ul>
+    </section>
+    <section role="tabpanel" id="panel-other" aria-labelledby="tab-other" data-panel="other" hidden>
+      <p class="muted small">Every other open issue (briefs and the rest).</p>
+      <ul id="other" class="list"></ul>
+    </section>
+    <section role="tabpanel" id="panel-opps" aria-labelledby="tab-opps" data-panel="opps" hidden>
+      <p class="muted small">From <code>opportunities/tracker.md</code>; ruled-out rows hidden.</p>
+      <div class="scroll"><table id="opps"></table></div>
+    </section>
+    <section role="tabpanel" id="panel-backlog" aria-labelledby="tab-backlog" data-panel="backlog" hidden>
+      <p class="muted small">The <em>Now</em> section of <code>mission/BACKLOG.md</code>, in priority order.</p>
+      <ol id="backlog"></ol>
+    </section>
+    <section role="tabpanel" id="panel-projects" aria-labelledby="tab-projects" data-panel="projects" hidden>
+      <div id="projects"></div>
+    </section>
+    <section role="tabpanel" id="panel-journal" aria-labelledby="tab-journal" data-panel="journal" hidden>
+      <h2 id="journal-title">Latest journal</h2>
+      <pre id="journal" class="journal"></pre>
+    </section>
+    <section role="tabpanel" id="panel-repos" aria-labelledby="tab-repos" data-panel="repos" hidden>
+      <p class="muted small">
+        Every repository the token can see, plus your public ones, most recently pushed first. Private repositories
+        appear only if the token covers them (re-run <code>npm run admin:seal</code> with <em>All repositories</em>). Full list on
+        <a href="https://github.com/verysillytuna?tab=repositories">GitHub</a>.
+      </p>
+      <ul id="repos" class="repos"></ul>
+    </section>
+    <section role="tabpanel" id="panel-claude" aria-labelledby="tab-claude" data-panel="claude" hidden>
+      <ul id="claude-links" class="list"></ul>
+      <p class="muted small" id="next-run-claude"></p>
+    </section>
   </section>
 
   <script is:inline type="application/json" id="vault" set:html={JSON.stringify(vault)} />
@@ -178,6 +234,75 @@ const vault = Object.values(found)[0] ?? null;
     vertical-align: top;
     padding: 0.35rem 0.6rem 0.35rem 0;
     border-bottom: 1px solid var(--rule);
+  }
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 1.4rem 0 1.2rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+  .tabs button {
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 0.25rem 0.65rem;
+  }
+  .tabs button[aria-selected='true'] {
+    color: var(--accent);
+    border-color: var(--accent);
+    background: var(--tint-rose);
+  }
+  .count {
+    margin-left: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--accent-2);
+  }
+  .count:empty {
+    display: none;
+  }
+  .overview {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+    gap: 0.6rem;
+  }
+  :global(.overview button) {
+    font: inherit;
+    cursor: pointer;
+    display: grid;
+    width: 100%;
+    text-align: left;
+    gap: 0.1rem;
+    padding: 0.6rem 0.8rem;
+    color: var(--fg);
+    background: var(--tint-denim);
+    border: 1px solid transparent;
+  }
+  :global(.overview button:hover) {
+    border-color: var(--accent);
+  }
+  :global(.overview .n) {
+    font-size: 1.6rem;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .repos {
+    list-style: none;
+    padding: 0;
+  }
+  :global(.repos li) {
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  :global(.repos .meta) {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+  :global(.repos .meta a) {
+    margin-right: 0.6rem;
   }
   .journal {
     white-space: pre-wrap;

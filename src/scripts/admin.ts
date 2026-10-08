@@ -1,9 +1,14 @@
 // Client for /admin: unlock the vault, then render the workbench dashboard from the GitHub REST API.
-// Same sections and actions as workbench apps/dashboard (milestones 1–2), without the local server.
+// Same sections and actions as workbench apps/dashboard (milestones 1–2), without the local server,
+// one tab per section, plus Repos and Claude tabs.
 
 import {
+  CLAUDE_LINKS,
   DAILY_BODY,
+  OWNER,
   REPOS,
+  mergeRepos,
+  minutesToNextRun,
   inline,
   markLocal,
   pacificToday,
@@ -11,6 +16,7 @@ import {
   parseStatus,
   parseTable,
   unseal,
+  type Repo,
   type Vault,
 } from './admin-core';
 
@@ -100,6 +106,8 @@ function showDashboard() {
     $('logout').addEventListener('click', () => signOut());
     $('refresh').addEventListener('click', () => load());
     wireCreateForm();
+    wireTabs();
+    renderClaude();
   }
   load();
 }
@@ -135,10 +143,11 @@ async function load() {
     }
   };
 
-  const [issueLists, prLists, files] = await Promise.all([
+  const [issueLists, prLists, files, repos] = await Promise.all([
     Promise.all(REPOS.map((r) => attempt(gh(`/repos/${r}/issues?state=open&per_page=100`), []))),
     Promise.all(REPOS.map((r) => attempt(gh(`/repos/${r}/pulls?state=open&per_page=100`), []))),
     attempt(loadWorkbenchFiles(), null),
+    attempt(loadRepos(), []),
   ]);
   if (!token) return;
 
@@ -172,9 +181,31 @@ async function load() {
   renderIssues('other', other);
   renderPRs(prs);
   if (files) renderFiles(files);
+  renderRepos(repos);
+  const counts: Record<string, number> = {
+    asks: asks.length,
+    inbox: inbox.length,
+    prs: prs.length,
+    other: other.length,
+    opps: files?.opportunities.length ?? 0,
+    backlog: files?.backlog.length ?? 0,
+    projects: files?.statuses.length ?? 0,
+    repos: repos.length,
+  };
+  renderCounts(counts);
+  renderClaude();
 
   $('errors').replaceChildren(...errors.map((e) => li(e)));
   $('taken').textContent = `Updated ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
+}
+
+// Repos the token can see (all of them if it was created for all repositories) plus the public ones.
+async function loadRepos(): Promise<Repo[]> {
+  const [mine, pub] = await Promise.all([
+    gh('/user/repos?affiliation=owner&sort=pushed&per_page=100').catch(() => []),
+    gh(`/users/${OWNER}/repos?sort=pushed&per_page=100`).catch(() => []),
+  ]);
+  return mergeRepos(mine, pub);
 }
 
 async function loadWorkbenchFiles() {
@@ -334,6 +365,127 @@ function renderFiles(f: Awaited<ReturnType<typeof loadWorkbenchFiles>>) {
   );
   $('journal-title').textContent = f.journalName ? `Latest journal: ${f.journalName}` : 'Latest journal';
   $('journal').textContent = f.journal || 'None.';
+}
+
+// ---------------------------------------------------------------------------
+// Tabs (the selected one is kept in the URL hash, e.g. /admin/#inbox)
+
+const TAB_LABELS: Record<string, string> = {
+  asks: 'Your asks',
+  inbox: 'Inbox',
+  prs: 'Pull requests',
+  other: 'Other issues',
+  opps: 'Opportunities',
+  backlog: 'Backlog items',
+  projects: 'Projects',
+  repos: 'Repos',
+};
+
+function tabButtons() {
+  return [...document.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+}
+
+function selectTab(id: string, focus = false) {
+  const buttons = tabButtons();
+  if (!buttons.some((b) => b.dataset.tab === id)) id = 'overview';
+  for (const b of buttons) {
+    const on = b.dataset.tab === id;
+    b.setAttribute('aria-selected', String(on));
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+  }
+  for (const panel of document.querySelectorAll<HTMLElement>('[role=tabpanel]')) panel.hidden = panel.dataset.panel !== id;
+  if (location.hash.slice(1) !== id) history.replaceState(null, '', id === 'overview' ? location.pathname : `#${id}`);
+}
+
+function wireTabs() {
+  const buttons = tabButtons();
+  for (const b of buttons) {
+    b.addEventListener('click', () => selectTab(b.dataset.tab!));
+    b.addEventListener('keydown', (e) => {
+      const i = buttons.indexOf(b);
+      const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: buttons.length - 1 }[e.key];
+      if (next === undefined) return;
+      e.preventDefault();
+      selectTab(buttons[(next + buttons.length) % buttons.length].dataset.tab!, true);
+    });
+  }
+  window.addEventListener('hashchange', () => selectTab(location.hash.slice(1)));
+  selectTab(location.hash.slice(1));
+}
+
+function renderCounts(counts: Record<string, number>) {
+  for (const el of document.querySelectorAll<HTMLElement>('[data-count]')) el.textContent = String(counts[el.dataset.count!] ?? '');
+  $('overview').replaceChildren(
+    ...Object.entries(TAB_LABELS).map(([id, label]) => {
+      const item = document.createElement('li');
+      const b = document.createElement('button');
+      b.type = 'button';
+      const n = document.createElement('span');
+      n.className = 'n';
+      n.textContent = String(counts[id] ?? 0);
+      const l = document.createElement('span');
+      l.textContent = label;
+      b.append(n, l);
+      b.addEventListener('click', () => selectTab(id, true));
+      item.append(b);
+      return item;
+    }),
+  );
+}
+
+function nextRunText() {
+  const m = minutesToNextRun();
+  const when = new Date(Date.now() + m * 60_000).toLocaleTimeString('en-US', {
+    timeZone: 'America/Los_Angeles',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+  return `Next scheduled Claude run: ${when} Pacific, in ${Math.floor(m / 60)} h ${m % 60} min.`;
+}
+
+function renderClaude() {
+  $('claude-links').replaceChildren(
+    ...CLAUDE_LINKS.map((c) => {
+      const item = document.createElement('li');
+      item.append(link(c.label, c.href), ' · ');
+      const note = document.createElement('span');
+      note.className = 'muted';
+      note.textContent = c.note;
+      item.append(note);
+      return item;
+    }),
+  );
+  $('next-run').textContent = $('next-run-claude').textContent = nextRunText();
+}
+
+function renderRepos(repos: Repo[]) {
+  if (!repos.length) return $('repos').replaceChildren(li('None visible to this token.'));
+  $('repos').replaceChildren(
+    ...repos.map((r) => {
+      const item = document.createElement('li');
+      item.append(link(r.name, r.url));
+      const flags = [r.private ? 'private' : 'public', r.fork && 'fork', r.archived && 'archived'].filter(Boolean) as string[];
+      for (const f of flags) {
+        const tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = f;
+        item.append(tag);
+      }
+      if (r.description) item.append(` · ${r.description}`);
+      const meta = document.createElement('span');
+      meta.className = 'meta';
+      meta.append(
+        link('issues', `${r.url}/issues`),
+        link('pull requests', `${r.url}/pulls`),
+        link('actions', `${r.url}/actions`),
+        r.pushed ? `pushed ${new Date(r.pushed).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}` : '',
+        r.openIssues ? ` · ${r.openIssues} open issues and PRs` : '',
+      );
+      item.append(meta);
+      return item;
+    }),
+  );
 }
 
 // ---------------------------------------------------------------------------

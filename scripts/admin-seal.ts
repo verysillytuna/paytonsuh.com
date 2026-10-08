@@ -31,7 +31,8 @@ if (password.length < 12) throw new Error('use a password of at least 12 charact
 if (password !== again) throw new Error('passwords differ');
 
 console.log(`\nCreate a fine-grained token at https://github.com/settings/personal-access-tokens/new
-  Resource owner: verysillytuna · Repositories: ${REPOS.map((r) => r.split('/')[1]).join(', ')}
+  Resource owner: verysillytuna · Repositories: All repositories (so the Repos tab lists private ones too),
+    or at least ${REPOS.map((r) => r.split('/')[1]).join(', ')}
   Permissions: Issues (read and write), Pull requests (read), Contents (read), Metadata (read)
   Expiration: up to a year (re-run this script when it expires)\n`);
 const token = (await ask('Token (input hidden): ', true)).trim();
