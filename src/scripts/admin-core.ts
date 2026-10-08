@@ -118,3 +118,62 @@ export const DAILY_BODY =
 export function markLocal(body: string): string {
   return body.replace(/(### Needs files on my Mac\?\s*\n\s*\n)No\s*$/, '$1Yes');
 }
+
+export const OWNER = 'verysillytuna';
+
+/** Claude links shown on the Claude tab. Opening them still requires the claude.ai login. */
+export const CLAUDE_LINKS = [
+  {
+    label: 'Workbench routine',
+    href: 'https://claude.ai/code/routines/trig_01TLq1GFygktyR16NjA37SiP',
+    note: 'The twice-daily unattended run: schedule, history, run now.',
+  },
+  { label: 'Claude Code sessions', href: 'https://claude.ai/code', note: 'Every cloud session, including past routine runs.' },
+] as const;
+
+/** Pacific hours at which the routine fires (midnight and noon). */
+export const RUN_HOURS = [0, 12] as const;
+
+/** Minutes from `now` until the next scheduled run, in Pacific wall-clock time. */
+export function minutesToNextRun(now = new Date(), hours: readonly number[] = RUN_HOURS): number {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' })
+      .formatToParts(now)
+      .map((p) => [p.type, p.value]),
+  );
+  const current = Number(parts.hour) * 60 + Number(parts.minute);
+  const waits = hours.map((h) => (h * 60 - current + 1440) % 1440 || 1440);
+  return Math.min(...waits);
+}
+
+export interface Repo {
+  name: string;
+  full: string;
+  url: string;
+  description: string;
+  private: boolean;
+  archived: boolean;
+  fork: boolean;
+  pushed: string;
+  openIssues: number;
+}
+
+/** Combine repo lists from several endpoints: one entry per repo, most recently pushed first. */
+export function mergeRepos(...lists: any[][]): Repo[] {
+  const seen = new Map<string, Repo>();
+  for (const r of lists.flat()) {
+    if (!r?.full_name || seen.has(r.full_name)) continue;
+    seen.set(r.full_name, {
+      name: r.name,
+      full: r.full_name,
+      url: r.html_url,
+      description: r.description ?? '',
+      private: Boolean(r.private),
+      archived: Boolean(r.archived),
+      fork: Boolean(r.fork),
+      pushed: r.pushed_at ?? '',
+      openIssues: r.open_issues_count ?? 0,
+    });
+  }
+  return [...seen.values()].sort((a, b) => b.pushed.localeCompare(a.pushed));
+}
