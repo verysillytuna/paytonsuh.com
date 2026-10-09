@@ -1,59 +1,33 @@
 % Linear Algebra: A Reference — Payton Suh
-% Build: tectonic linear-algebra.tex   (or: npm run notes:pdf from the repo root)
+% Style: classic article, matching the LaTeX notes template (Computer Modern, 0.5 in margins).
+% Build: tectonic -X compile linear-algebra.tex   (or: npm run notes:pdf from the repo root; pdflatex also works)
 \documentclass[11pt]{article}
 
-\usepackage[letterpaper,margin=0.9in,headheight=14pt]{geometry}
-\usepackage{amsmath,mathtools}
-\usepackage{unicode-math}
-\setmainfont{EBGaramond}[Extension=.otf,UprightFont=*-Regular,ItalicFont=*-Italic,
-  BoldFont=*-Bold,BoldItalicFont=*-BoldItalic,Numbers=Lining]
-\setmathfont{Garamond-Math.otf}[StylisticSet={7,8,9}]
-\usepackage{xcolor}
+\usepackage[letterpaper,margin=0.5in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
 \usepackage{enumitem}
-\usepackage{booktabs,array,tabularx}
-\usepackage{titlesec}
-\usepackage{fancyhdr}
-\usepackage[most]{tcolorbox}
+\usepackage{array,tabularx}
+\usepackage[labelsep=colon,textfont=it]{caption}
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 
-% ---------------------------------------------------------------- palette
-\definecolor{burgundy}{HTML}{8A4555}
-\definecolor{denim}{HTML}{58708D}
-\definecolor{leather}{HTML}{84674F}
-\definecolor{plum}{HTML}{79546A}
-\definecolor{ink}{HTML}{2A2E3A}
-\definecolor{muted}{HTML}{676C77}
-\definecolor{tintrose}{HTML}{F8F3F1}
-\definecolor{tintdenim}{HTML}{F2F4F6}
-\definecolor{tintsand}{HTML}{F6F2EB}
-\color{ink}
-\hypersetup{colorlinks,linkcolor=burgundy,urlcolor=denim}
-
-% ---------------------------------------------------------------- layout
 \setlength{\parindent}{0pt}
-\setlength{\parskip}{0.45em}
-\setlist{nosep,leftmargin=1.4em,topsep=0.2em}
-\titleformat{\section}{\Large\scshape\color{burgundy}}{\thesection}{0.8em}{}[{\color{burgundy!30}\titlerule}]
-\titleformat{\subsection}{\large\itshape\color{denim}}{\thesubsection}{0.7em}{}
-\titlespacing*{\section}{0pt}{1.6em}{0.7em}
-\titlespacing*{\subsection}{0pt}{1.1em}{0.35em}
-\pagestyle{fancy}
-\fancyhf{}
-\renewcommand{\headrulewidth}{0pt}
-\fancyhead[L]{\small\scshape\color{muted}Linear Algebra: A Reference}
-\fancyhead[R]{\small\color{muted}paytonsuh.com}
-\fancyfoot[C]{\small\color{muted}\thepage}
+\setlength{\parskip}{0.6em}
+\setlist[enumerate,1]{label=\arabic*.,leftmargin=2.2em}
+\setlist[enumerate,2]{label=(\alph*),leftmargin=2em}
+\setlist[enumerate,3]{label=\roman*.,leftmargin=2em}
+\setlist[enumerate,4]{label=\Alph*.,leftmargin=1.6em,nosep}
 
-% ---------------------------------------------------------------- boxes
-\tcbset{
-  base/.style={enhanced,breakable,boxrule=0pt,sharp corners,left=8pt,right=8pt,top=5pt,bottom=5pt,
-    before skip=0.7em,after skip=0.7em,fonttitle=\scshape,coltitle=#1,colbacktitle=white,
-    attach title to upper={.\enspace},borderline west={1.2pt}{0pt}{#1!70}},
-}
-\newtcolorbox{defbox}[1][]{base=denim,colback=tintdenim,title={Definition#1}}
-\newtcolorbox{thmbox}[1][]{base=burgundy,colback=tintrose,title={Theorem#1}}
-\newtcolorbox{factbox}[1][]{base=leather,colback=tintsand,title={#1}}
+\newtheorem{theorem}{Theorem}[section]
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+
+% A named, unnumbered block for summaries ("The invertible matrix theorem", "Least squares", ...).
+\newenvironment{fact}[1]{\par\noindent\textbf{#1.}\ }{\par}
 
 \newcommand{\F}{\mathbb{F}}
 \newcommand{\R}{\mathbb{R}}
@@ -74,91 +48,95 @@
 \DeclareMathOperator{\tr}{tr}
 \renewcommand{\det}{\operatorname{det}}
 
+% Title block like the homework: bold title, then an italic introductory paragraph.
+\newcommand{\maketitleblock}[1]{{\noindent\Large\bfseries #1\par}\vspace{0.6em}}
+\newenvironment{intro}{\itshape}{\par}
+
 \begin{document}
 
-% ---------------------------------------------------------------- title
-\begin{center}
-  {\color{burgundy}\rule{\linewidth}{0.6pt}}\\[0.9em]
-  {\Huge\scshape Linear Algebra}\\[0.25em]
-  {\Large\itshape\color{denim} A Reference: Definitions, Theorems, and Notation}\\[0.6em]
-  {\normalsize Payton Suh \,·\, Mathematics, UCLA}\\[0.6em]
-  {\color{burgundy}\rule{\linewidth}{0.6pt}}
-\end{center}
+\maketitleblock{Linear Algebra: A Reference}
 
-\vspace{0.4em}
-{\small\color{muted}
+Payton Suh, Mathematics, UCLA
+
+\begin{intro}
 A compact reference for a proof-based first course in linear algebra, in the conventions of
 Friedberg, Insel \& Spence. Statements are given without proof. Throughout, $\F$ denotes a field
-(usually $\R$ or $\C$), and all vector spaces are over $\F$ unless stated otherwise.}
+(usually $\R$ or $\C$), and all vector spaces are over $\F$ unless stated otherwise.
+\end{intro}
 
 \tableofcontents
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Notation
 \section{Notation}
 
 \renewcommand{\arraystretch}{1.18}
-\begin{tabularx}{\linewidth}{@{}>{\color{burgundy}}l X@{}}
-\toprule
-$\F^n$ & column vectors $(a_1,\dots,a_n)^{t}$ with entries in $\F$ \\
-$\M_{m\times n}(\F)$ & $m\times n$ matrices over $\F$; $A_{ij}$ is the $(i,j)$ entry \\
-$\Poly_n(\F)$, $\Poly(\F)$ & polynomials of degree $\le n$; all polynomials \\
-$e_1,\dots,e_n$ & the standard basis of $\F^n$; $\delta_{ij}$ is the Kronecker delta \\
-$\I_V$, $I_n$ & identity map on $V$; $n\times n$ identity matrix \\
-$\spn(S)$ & set of all (finite) linear combinations of elements of $S$; $\spn(\varnothing)=\{0\}$ \\
-$\Lin(V,W)$, $\Lin(V)$ & linear maps $V\to W$; linear operators on $V$ \\
-$\N(\T)$, $\Rg(\T)$ & null space (kernel) and range (image) of $\T$ \\
-$\nullity(\T)$, $\rank(\T)$ & $\dim\N(\T)$ and $\dim\Rg(\T)$ \\
-$[v]_\beta$ & coordinate vector of $v$ relative to an ordered basis $\beta$ \\
-$[\T]_\beta^\gamma$, $[\T]_\beta$ & matrix of $\T$ relative to $\beta$ (domain) and $\gamma$ (codomain); $[\T]_\beta=[\T]_\beta^\beta$ \\
-$L_A$ & left-multiplication map $x\mapsto Ax$, $\F^n\to\F^m$ \\
-$A^{t}$, $A^{*}$ & transpose; conjugate transpose $(A^*)_{ij}=\overline{A_{ji}}$ \\
-$\det(A)$, $\tr(A)$ & determinant; trace $\sum_i A_{ii}$ \\
-$W_1\oplus W_2$ & direct sum: $W_1+W_2$ with $W_1\cap W_2=\{0\}$ \\
-$V^{*}$, $\T^{t}$ & dual space $\Lin(V,\F)$; transpose (dual) map $g\mapsto g\circ \T$ \\
-$V/W$ & quotient space, cosets $v+W$ \\
-$E_\lambda$, $K_\lambda$ & eigenspace $\N(\T-\lambda\I)$; generalized eigenspace \\
-$f(t)$, $p(t)$ & characteristic polynomial $\det(A-tI)$; minimal polynomial \\
-$\ip{x}{y}$, $\norm{x}$ & inner product; norm $\sqrt{\ip{x}{x}}$ \\
-$S^{\perp}$ & orthogonal complement $\{x:\ip{x}{y}=0 \text{ for all } y\in S\}$ \\
-$\T^{*}$ & adjoint of $\T$: $\ip{\T x}{y}=\ip{x}{\T^* y}$ \\
-\bottomrule
+\begin{tabularx}{\linewidth}{|l|X|}
+\hline
+$\F^n$ & column vectors $(a_1,\dots,a_n)^{t}$ with entries in $\F$ \\ \hline
+$\M_{m\times n}(\F)$ & $m\times n$ matrices over $\F$; $A_{ij}$ is the $(i,j)$ entry \\ \hline
+$\Poly_n(\F)$, $\Poly(\F)$ & polynomials of degree $\le n$; all polynomials \\ \hline
+$e_1,\dots,e_n$ & the standard basis of $\F^n$; $\delta_{ij}$ is the Kronecker delta \\ \hline
+$\I_V$, $I_n$ & identity map on $V$; $n\times n$ identity matrix \\ \hline
+$\spn(S)$ & set of all (finite) linear combinations of elements of $S$; $\spn(\varnothing)=\{0\}$ \\ \hline
+$\Lin(V,W)$, $\Lin(V)$ & linear maps $V\to W$; linear operators on $V$ \\ \hline
+$\N(\T)$, $\Rg(\T)$ & null space (kernel) and range (image) of $\T$ \\ \hline
+$\nullity(\T)$, $\rank(\T)$ & $\dim\N(\T)$ and $\dim\Rg(\T)$ \\ \hline
+$[v]_\beta$ & coordinate vector of $v$ relative to an ordered basis $\beta$ \\ \hline
+$[\T]_\beta^\gamma$, $[\T]_\beta$ & matrix of $\T$ relative to $\beta$ (domain) and $\gamma$ (codomain); $[\T]_\beta=[\T]_\beta^\beta$ \\ \hline
+$L_A$ & left-multiplication map $x\mapsto Ax$, $\F^n\to\F^m$ \\ \hline
+$A^{t}$, $A^{*}$ & transpose; conjugate transpose $(A^*)_{ij}=\overline{A_{ji}}$ \\ \hline
+$\det(A)$, $\tr(A)$ & determinant; trace $\sum_i A_{ii}$ \\ \hline
+$W_1\oplus W_2$ & direct sum: $W_1+W_2$ with $W_1\cap W_2=\{0\}$ \\ \hline
+$V^{*}$, $\T^{t}$ & dual space $\Lin(V,\F)$; transpose (dual) map $g\mapsto g\circ \T$ \\ \hline
+$V/W$ & quotient space, cosets $v+W$ \\ \hline
+$E_\lambda$, $K_\lambda$ & eigenspace $\N(\T-\lambda\I)$; generalized eigenspace \\ \hline
+$f(t)$, $p(t)$ & characteristic polynomial $\det(A-tI)$; minimal polynomial \\ \hline
+$\ip{x}{y}$, $\norm{x}$ & inner product; norm $\sqrt{\ip{x}{x}}$ \\ \hline
+$S^{\perp}$ & orthogonal complement $\{x:\ip{x}{y}=0 \text{ for all } y\in S\}$ \\ \hline
+$\T^{*}$ & adjoint of $\T$: $\ip{\T x}{y}=\ip{x}{\T^* y}$ \\ \hline
 \end{tabularx}
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Vector Spaces
 \section{Vector Spaces}
 
-\begin{defbox}[: vector space]
+\begin{definition}[vector space]
 A set $V$ with addition $V\times V\to V$ and scalar multiplication $\F\times V\to V$ such that for all
 $x,y,z\in V$ and $a,b\in\F$:
 (VS1) $x+y=y+x$; (VS2) $(x+y)+z=x+(y+z)$; (VS3) there is $0\in V$ with $x+0=x$;
 (VS4) each $x$ has $y$ with $x+y=0$; (VS5) $1x=x$; (VS6) $(ab)x=a(bx)$;
 (VS7) $a(x+y)=ax+ay$; (VS8) $(a+b)x=ax+bx$.
-\end{defbox}
+\end{definition}
 
 Standard examples: $\F^n$, $\M_{m\times n}(\F)$, $\Poly_n(\F)$, $\Poly(\F)$, and the space $\mathcal{F}(S,\F)$ of all
 functions from a set $S$ to $\F$. Consequences of the axioms: the zero vector and additive inverses are
 unique, $0x=0$, $a0=0$, and $(-a)x=-(ax)$.
 
+%----------------------------------------------------------
+% Subsection: Subspaces
 \subsection{Subspaces}
-\begin{thmbox}[: subspace test]
+\begin{theorem}[subspace test]
 A subset $W\subseteq V$ is a subspace if and only if $0\in W$, and $x+y\in W$ and $cx\in W$
 whenever $x,y\in W$ and $c\in\F$.
-\end{thmbox}
+\end{theorem}
 Intersections of subspaces are subspaces; unions generally are not. $W_1\cup W_2$ is a subspace iff
 $W_1\subseteq W_2$ or $W_2\subseteq W_1$. The \emph{sum} $W_1+W_2=\{w_1+w_2\}$ is the smallest subspace containing both,
 and $V=W_1\oplus W_2$ iff every $v\in V$ is \emph{uniquely} $w_1+w_2$.
 
+%----------------------------------------------------------
+% Subsection: Span, independence, bases
 \subsection{Span, independence, bases}
-\begin{defbox}[s]
+\begin{definition}
 $S$ is \emph{linearly dependent} if $a_1u_1+\dots+a_nu_n=0$ for some distinct $u_i\in S$ and scalars not all zero;
 otherwise \emph{linearly independent}. A \emph{basis} is a linearly independent set that spans $V$.
 The \emph{dimension} $\dim V$ is the number of vectors in any basis.
-\end{defbox}
+\end{definition}
 
-\begin{thmbox}[: replacement theorem]
+\begin{theorem}[replacement theorem]
 If $V=\spn(G)$ with $|G|=n$ and $L\subseteq V$ is linearly independent with $|L|=m$, then $m\le n$, and there is
 $H\subseteq G$ with $|H|=n-m$ such that $L\cup H$ spans $V$.
-\end{thmbox}
+\end{theorem}
 
 Consequences, for $\dim V=n<\infty$:
 \begin{itemize}
@@ -169,26 +147,29 @@ Consequences, for $\dim V=n<\infty$:
   \item a subspace $W$ has $\dim W\le n$, with equality iff $W=V$.
 \end{itemize}
 
-\begin{factbox}{Dimension of a sum}
+\begin{fact}{Dimension of a sum}
 For finite-dimensional subspaces, $\dim(W_1+W_2)=\dim W_1+\dim W_2-\dim(W_1\cap W_2)$.
 Common dimensions: $\dim\F^n=n$, $\dim\M_{m\times n}(\F)=mn$, $\dim\Poly_n(\F)=n+1$; $\Poly(\F)$ is infinite-dimensional.
-\end{factbox}
+\end{fact}
 
+%----------------------------------------------------------
+% Subsection: Quotient spaces
 \subsection{Quotient spaces}
 For a subspace $W$, the cosets $v+W$ form a vector space $V/W$ under $(v_1+W)+(v_2+W)=(v_1+v_2)+W$ and $a(v+W)=av+W$;
 $v_1+W=v_2+W$ iff $v_1-v_2\in W$. If $V$ is finite-dimensional, $\dim(V/W)=\dim V-\dim W$.
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Linear Transformations
 \section{Linear Transformations}
 
-\begin{defbox}[: linear map]
+\begin{definition}[linear map]
 $\T\colon V\to W$ is linear if $\T(x+y)=\T x+\T y$ and $\T(cx)=c\,\T x$; equivalently $\T(cx+y)=c\T x+\T y$.
 Then $\T(0)=0$. Its \emph{null space} is $\N(\T)=\{x:\T x=0\}$ and its \emph{range} is $\Rg(\T)=\{\T x\}$; both are subspaces.
-\end{defbox}
+\end{definition}
 
-\begin{thmbox}[: rank–nullity (dimension theorem)]
+\begin{theorem}[rank–nullity (dimension theorem)]
 If $V$ is finite-dimensional and $\T\colon V\to W$ is linear, then $\nullity(\T)+\rank(\T)=\dim V$.
-\end{thmbox}
+\end{theorem}
 
 \begin{itemize}
   \item $\T$ is one-to-one iff $\N(\T)=\{0\}$.
@@ -197,58 +178,71 @@ If $V$ is finite-dimensional and $\T\colon V\to W$ is linear, then $\nullity(\T)
   \item A linear map is determined by its values on a basis, and any assignment of values on a basis extends uniquely to a linear map.
 \end{itemize}
 
+%----------------------------------------------------------
+% Subsection: Matrix representations
 \subsection{Matrix representations}
 For ordered bases $\beta=\{v_1,\dots,v_n\}$ of $V$ and $\gamma=\{w_1,\dots,w_m\}$ of $W$, write $\T v_j=\sum_i a_{ij}w_i$.
 Then $[\T]_\beta^\gamma=(a_{ij})\in\M_{m\times n}(\F)$: \emph{column $j$ is $[\T v_j]_\gamma$}.
 
-\begin{thmbox}[s: representation]
+\begin{theorem}[representation]
 \[
 [\T(v)]_\gamma=[\T]_\beta^\gamma\,[v]_\beta,\qquad
 [\U\T]_\alpha^\gamma=[\U]_\beta^\gamma[\T]_\alpha^\beta,\qquad
 [\T+c\,\U]_\beta^\gamma=[\T]_\beta^\gamma+c\,[\U]_\beta^\gamma .
 \]
 The map $\T\mapsto[\T]_\beta^\gamma$ is an isomorphism $\Lin(V,W)\cong\M_{m\times n}(\F)$, so $\dim\Lin(V,W)=mn$.
-\end{thmbox}
+\end{theorem}
 
+%----------------------------------------------------------
+% Subsection: Invertibility and isomorphism
 \subsection{Invertibility and isomorphism}
 $\T$ is invertible if there is $\U$ with $\U\T=\I_V$ and $\T\U=\I_W$; then $\T^{-1}$ is linear and unique.
 $\T$ is invertible iff it is one-to-one and onto, and in that case $[\T^{-1}]_\gamma^\beta=([\T]_\beta^\gamma)^{-1}$.
 Finite-dimensional $V$ and $W$ are isomorphic iff $\dim V=\dim W$; in particular $V\cong\F^n$ via $v\mapsto[v]_\beta$.
 
+%----------------------------------------------------------
+% Subsection: Change of coordinates
 \subsection{Change of coordinates}
-\begin{thmbox}[: change of basis]
+\begin{theorem}[change of basis]
 Let $\beta,\beta'$ be ordered bases of $V$ and $Q=[\I_V]_{\beta'}^{\beta}$ (its columns are the $\beta$-coordinates of the vectors of $\beta'$).
 Then $Q$ is invertible, $[v]_\beta=Q[v]_{\beta'}$, and for $\T\in\Lin(V)$,
 \[
 [\T]_{\beta'}=Q^{-1}[\T]_\beta\,Q .
 \]
-\end{thmbox}
+\end{theorem}
 Matrices $A,B$ are \emph{similar} if $B=Q^{-1}AQ$ for some invertible $Q$. Similar matrices share rank, determinant,
 trace, characteristic polynomial, eigenvalues (with multiplicities), and minimal polynomial.
 
+%----------------------------------------------------------
+% Subsection: Dual spaces
 \subsection{Dual spaces}
 $V^{*}=\Lin(V,\F)$. If $\beta=\{x_1,\dots,x_n\}$ is a basis of $V$, the \emph{dual basis} $\beta^*=\{f_1,\dots,f_n\}$ is defined by
 $f_i(x_j)=\delta_{ij}$, and every $f\in V^*$ satisfies $f=\sum_i f(x_i)f_i$. So $\dim V^*=\dim V$ when finite.
 The transpose $\T^{t}\colon W^*\to V^*$, $\T^t(g)=g\T$, satisfies $[\T^t]_{\gamma^*}^{\beta^*}=([\T]_\beta^\gamma)^{t}$.
 The map $x\mapsto\hat x$, $\hat x(f)=f(x)$, is a natural isomorphism $V\cong V^{**}$ for finite-dimensional $V$.
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Matrices and Linear Systems
 \section{Matrices and Linear Systems}
 
+%----------------------------------------------------------
+% Subsection: Elementary operations and rank
 \subsection{Elementary operations and rank}
 The three elementary row (column) operations are: swap two rows; multiply a row by a nonzero scalar; add a
 multiple of one row to another. Each equals left (right) multiplication by an invertible \emph{elementary matrix}.
 
-\begin{thmbox}[: rank]
+\begin{theorem}[rank]
 $\rank(A)=\rank(L_A)$ equals the dimension of the column space, which equals the dimension of the row space.
 Multiplying by invertible matrices preserves rank, so elementary operations preserve rank, and
 $\rank(A)=\rank(A^t)$. Moreover $\rank(AB)\le\min\{\rank A,\rank B\}$.
-\end{thmbox}
+\end{theorem}
 
 Every matrix of rank $r$ can be reduced by elementary operations to $\begin{psmallmatrix} I_r & 0\\ 0& 0\end{psmallmatrix}$, and
 every invertible matrix is a product of elementary matrices.
 To invert $A$, row reduce $(A\mid I_n)$ to $(I_n\mid A^{-1})$.
 
+%----------------------------------------------------------
+% Subsection: Systems $Ax=b$
 \subsection{Systems $Ax=b$}
 \begin{itemize}
   \item The solution set $K_H$ of $Ax=0$ is $\N(L_A)$, of dimension $n-\rank A$.
@@ -258,24 +252,25 @@ To invert $A$, row reduce $(A\mid I_n)$ to $(I_n\mid A^{-1})$.
   \item Gaussian elimination: row reduce $(A\mid b)$ to reduced row echelon form; the RREF of a matrix is unique.
 \end{itemize}
 
-\begin{factbox}{The invertible matrix theorem}
+\begin{fact}{The invertible matrix theorem}
 For $A\in\M_{n\times n}(\F)$ the following are equivalent:
 $A$ is invertible; $\rank A=n$; $\N(L_A)=\{0\}$; $L_A$ is onto; the columns (or rows) of $A$ form a basis of $\F^n$;
 $Ax=b$ has a unique solution for every $b$; $A$ is a product of elementary matrices; $A$ row reduces to $I_n$;
 $\det A\neq 0$; $0$ is not an eigenvalue of $A$.
-\end{factbox}
+\end{fact}
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Determinants
 \section{Determinants}
 
-\begin{thmbox}[: characterization]
+\begin{theorem}[characterization]
 $\det\colon\M_{n\times n}(\F)\to\F$ is the unique function that is linear in each row, is zero whenever two rows are
 equal (alternating), and satisfies $\det(I_n)=1$. Explicitly,
 \[
 \det(A)=\sum_{\sigma\in S_n}\operatorname{sgn}(\sigma)\,A_{1\sigma(1)}A_{2\sigma(2)}\cdots A_{n\sigma(n)},
 \]
 and by cofactor expansion along row $i$, $\det(A)=\sum_{j}(-1)^{i+j}A_{ij}\det(\tilde A_{ij})$, where $\tilde A_{ij}$ deletes row $i$ and column $j$.
-\end{thmbox}
+\end{theorem}
 
 \begin{itemize}
   \item Swapping two rows negates $\det$; scaling a row by $k$ scales $\det$ by $k$; adding a multiple of a row leaves $\det$ unchanged.
@@ -285,14 +280,15 @@ and by cofactor expansion along row $i$, $\det(A)=\sum_{j}(-1)^{i+j}A_{ij}\det(\
   \item Over $\R$, $\lvert\det A\rvert$ is the factor by which $L_A$ scales $n$-dimensional volume; the sign records orientation.
 \end{itemize}
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Eigenvalues and Diagonalization
 \section{Eigenvalues and Diagonalization}
 
-\begin{defbox}[s]
+\begin{definition}
 $\lambda\in\F$ is an \emph{eigenvalue} of $\T\in\Lin(V)$ if $\T v=\lambda v$ for some $v\neq0$, an \emph{eigenvector}.
 The \emph{characteristic polynomial} of $A\in\M_{n\times n}(\F)$ is $f(t)=\det(A-tI_n)$, of degree $n$ with leading
 coefficient $(-1)^n$; that of $\T$ is that of any $[\T]_\beta$. The \emph{eigenspace} is $E_\lambda=\N(\T-\lambda\I)$.
-\end{defbox}
+\end{definition}
 
 \begin{itemize}
   \item $\lambda$ is an eigenvalue iff $f(\lambda)=0$. The \emph{algebraic multiplicity} of $\lambda$ is its multiplicity as a root of $f$;
@@ -301,22 +297,26 @@ coefficient $(-1)^n$; that of $\T$ is that of any $[\T]_\beta$. The \emph{eigens
   \item If $f$ splits, $\det A=\prod\lambda_i$ and $\tr A=\sum\lambda_i$ (with multiplicity).
 \end{itemize}
 
-\begin{thmbox}[: diagonalizability]
+\begin{theorem}[diagonalizability]
 $\T$ is \emph{diagonalizable} if $V$ has a basis of eigenvectors of $\T$, i.e.\ $[\T]_\beta$ is diagonal for some $\beta$.
 This holds iff (1) $f$ splits over $\F$ and (2) for each eigenvalue, the geometric multiplicity equals the algebraic multiplicity;
 equivalently, $V=E_{\lambda_1}\oplus\cdots\oplus E_{\lambda_k}$. In particular, $n$ distinct eigenvalues suffice.
 Then $A=QDQ^{-1}$, where the columns of $Q$ are eigenvectors and $D$ is diagonal, and $A^m=QD^mQ^{-1}$.
-\end{thmbox}
+\end{theorem}
 
+%----------------------------------------------------------
+% Subsection: Invariant subspaces and Cayley–Hamilton
 \subsection{Invariant subspaces and Cayley–Hamilton}
 A subspace $W$ is \emph{$\T$-invariant} if $\T(W)\subseteq W$; then the characteristic polynomial of $\T|_W$ divides that of $\T$.
 The \emph{$\T$-cyclic subspace} generated by $x\neq0$ is $W=\spn\{x,\T x,\T^2x,\dots\}$; if $\dim W=k$, then $\{x,\dots,\T^{k-1}x\}$ is a basis and
 $\T^kx=-\sum_{i<k}a_i\T^ix$ gives the characteristic polynomial $(-1)^k(a_0+a_1t+\dots+a_{k-1}t^{k-1}+t^k)$ of $\T|_W$.
 
-\begin{thmbox}[: Cayley–Hamilton]
+\begin{theorem}[Cayley–Hamilton]
 If $f$ is the characteristic polynomial of $\T$, then $f(\T)=\mathsf{T}_0$, the zero operator. Likewise $f(A)=0$ for matrices.
-\end{thmbox}
+\end{theorem}
 
+%----------------------------------------------------------
+% Subsection: Minimal polynomial
 \subsection{Minimal polynomial}
 The \emph{minimal polynomial} $p$ of $\T$ is the unique monic polynomial of least positive degree with $p(\T)=\mathsf{T}_0$.
 \begin{itemize}
@@ -325,15 +325,16 @@ The \emph{minimal polynomial} $p$ of $\T$ is the unique monic polynomial of leas
   \item $\T$ is diagonalizable iff $p$ splits over $\F$ with no repeated roots, i.e.\ $p(t)=(t-\lambda_1)\cdots(t-\lambda_k)$ for distinct $\lambda_i$.
 \end{itemize}
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Canonical Forms
 \section{Canonical Forms}
 
-\begin{defbox}[: generalized eigenvectors]
+\begin{definition}[generalized eigenvectors]
 $x\neq0$ is a \emph{generalized eigenvector} for $\lambda$ if $(\T-\lambda\I)^px=0$ for some $p\ge1$.
 The \emph{generalized eigenspace} $K_\lambda=\{x:(\T-\lambda\I)^px=0\text{ for some }p\}$ is $\T$-invariant and contains $E_\lambda$.
-\end{defbox}
+\end{definition}
 
-\begin{thmbox}[: Jordan canonical form]
+\begin{theorem}[Jordan canonical form]
 If the characteristic polynomial of $\T$ splits, with distinct eigenvalues $\lambda_1,\dots,\lambda_k$ of multiplicities $m_1,\dots,m_k$, then
 $\dim K_{\lambda_i}=m_i$, $K_{\lambda_i}=\N\bigl((\T-\lambda_i\I)^{m_i}\bigr)$, and $V=K_{\lambda_1}\oplus\cdots\oplus K_{\lambda_k}$.
 There is an ordered basis (a union of cycles of generalized eigenvectors) in which
@@ -343,7 +344,7 @@ J=\begin{pmatrix}\lambda&1&&\\&\lambda&\ddots&\\&&\ddots&1\\&&&\lambda\end{pmatr
 \]
 This \emph{Jordan form} is unique up to the order of the blocks; two matrices with split characteristic polynomials are
 similar iff they have the same Jordan form.
-\end{thmbox}
+\end{theorem}
 
 \begin{itemize}
   \item The number of Jordan blocks for $\lambda$ equals $\dim E_\lambda$.
@@ -353,23 +354,26 @@ similar iff they have the same Jordan form.
 Over fields where $f$ need not split, the \emph{rational canonical form} plays the same role, built from companion matrices of
 powers of irreducible factors of $f$.
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Inner Product Spaces
 \section{Inner Product Spaces}
 
-\begin{defbox}[: inner product]
+\begin{definition}[inner product]
 On $V$ over $\F=\R$ or $\C$, an inner product $\ip{\cdot}{\cdot}$ satisfies, for all $x,y,z$ and $c$:
 $\ip{x+z}{y}=\ip{x}{y}+\ip{z}{y}$; $\ip{cx}{y}=c\ip{x}{y}$; $\overline{\ip{x}{y}}=\ip{y}{x}$; $\ip{x}{x}>0$ for $x\neq0$.
 It is therefore conjugate-linear in the second argument: $\ip{x}{cy}=\bar c\ip{x}{y}$.
 The standard inner product on $\F^n$ is $\ip{x}{y}=\sum_i x_i\overline{y_i}=y^*x$; on $\M_{n\times n}(\F)$ it is $\ip{A}{B}=\tr(B^*A)$.
-\end{defbox}
+\end{definition}
 
-\begin{thmbox}[: basic inequalities]
+\begin{theorem}[basic inequalities]
 For $\norm{x}=\sqrt{\ip{x}{x}}$:\;
 Cauchy–Schwarz $\lvert\ip{x}{y}\rvert\le\norm{x}\norm{y}$;\;
 triangle inequality $\norm{x+y}\le\norm{x}+\norm{y}$;\;
 Pythagoras $\norm{x+y}^2=\norm{x}^2+\norm{y}^2$ when $x\perp y$.
-\end{thmbox}
+\end{theorem}
 
+%----------------------------------------------------------
+% Subsection: Orthonormal bases and Gram–Schmidt
 \subsection{Orthonormal bases and Gram–Schmidt}
 A set is \emph{orthonormal} if its vectors are pairwise orthogonal unit vectors; orthogonal sets of nonzero vectors are linearly independent.
 If $\beta=\{v_1,\dots,v_n\}$ is an orthonormal basis, then
@@ -377,15 +381,17 @@ If $\beta=\{v_1,\dots,v_n\}$ is an orthonormal basis, then
 x=\sum_{i=1}^n\ip{x}{v_i}v_i,\qquad \norm{x}^2=\sum_i\lvert\ip{x}{v_i}\rvert^2,\qquad ([\T]_\beta)_{ij}=\ip{\T v_j}{v_i}.
 \]
 
-\begin{thmbox}[: Gram–Schmidt]
+\begin{theorem}[Gram–Schmidt]
 If $\{w_1,\dots,w_n\}$ is linearly independent, define $v_1=w_1$ and
 \[
 v_k=w_k-\sum_{j=1}^{k-1}\frac{\ip{w_k}{v_j}}{\norm{v_j}^2}\,v_j\qquad(2\le k\le n).
 \]
 Then $\{v_1,\dots,v_n\}$ is orthogonal with the same span (indeed $\spn\{v_1,\dots,v_k\}=\spn\{w_1,\dots,w_k\}$ for each $k$);
 normalizing gives an orthonormal basis. Every finite-dimensional inner product space has an orthonormal basis.
-\end{thmbox}
+\end{theorem}
 
+%----------------------------------------------------------
+% Subsection: Orthogonal complements and projections
 \subsection{Orthogonal complements and projections}
 \begin{itemize}
   \item For a finite-dimensional subspace $W$: $V=W\oplus W^\perp$, and $(W^\perp)^\perp=W$ when $V$ is finite-dimensional.
@@ -394,42 +400,45 @@ normalizing gives an orthonormal basis. Every finite-dimensional inner product s
   \item If $V$ is finite-dimensional, $\dim W+\dim W^\perp=\dim V$.
 \end{itemize}
 
-\begin{factbox}{Least squares}
+\begin{fact}{Least squares}
 For $A\in\M_{m\times n}(\F)$ and $y\in\F^m$, the vectors $x_0$ minimizing $\norm{Ax-y}$ are exactly the solutions of the
 \emph{normal equations} $A^*Ax_0=A^*y$. If $\rank A=n$, then $A^*A$ is invertible and $x_0=(A^*A)^{-1}A^*y$.
-\end{factbox}
+\end{fact}
 
+%----------------------------------------------------------
+% Subsection: The adjoint
 \subsection{The adjoint}
-\begin{thmbox}[: Riesz representation and adjoints]
+\begin{theorem}[Riesz representation and adjoints]
 If $V$ is finite-dimensional and $g\in V^*$, there is a unique $y\in V$ with $g(x)=\ip{x}{y}$ for all $x$.
 Consequently every $\T\in\Lin(V)$ has a unique \emph{adjoint} $\T^*$ with $\ip{\T x}{y}=\ip{x}{\T^*y}$, and for an
 orthonormal basis $\beta$, $[\T^*]_\beta=([\T]_\beta)^*$.
-\end{thmbox}
+\end{theorem}
 Rules: $(\T+\U)^*=\T^*+\U^*$, $(c\T)^*=\bar c\,\T^*$, $(\T\U)^*=\U^*\T^*$, $\T^{**}=\T$, $\I^*=\I$;
 $\N(\T^*)=\Rg(\T)^\perp$ and $\rank\T^*=\rank\T$.
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Normal, Self-Adjoint, and Unitary Operators
 \section{Normal, Self-Adjoint, and Unitary Operators}
 
-\begin{defbox}[s]
+\begin{definition}
 On a finite-dimensional inner product space, $\T$ is \emph{normal} if $\T\T^*=\T^*\T$; \emph{self-adjoint} (Hermitian) if $\T=\T^*$;
 \emph{unitary} ($\F=\C$) or \emph{orthogonal} ($\F=\R$) if $\T\T^*=\T^*\T=\I$, i.e.\ $\norm{\T x}=\norm{x}$ for all $x$.
 A matrix $A$ is unitary iff its columns form an orthonormal basis of $\F^n$, iff $A^{-1}=A^*$.
-\end{defbox}
+\end{definition}
 
-\begin{thmbox}[: Schur]
+\begin{theorem}[Schur]
 If the characteristic polynomial of $\T$ splits, there is an orthonormal basis $\beta$ for which $[\T]_\beta$ is upper triangular.
 In matrix form: $A=PUP^*$ with $P$ unitary (orthogonal) and $U$ upper triangular.
-\end{thmbox}
+\end{theorem}
 
-\begin{thmbox}[: spectral theorems]
+\begin{theorem}[spectral theorems]
 \emph{Complex:} $\T$ is normal $\iff$ $V$ has an orthonormal basis of eigenvectors of $\T$.\\
 \emph{Real:} $\T$ is self-adjoint $\iff$ $V$ has an orthonormal basis of eigenvectors of $\T$.\\
 In either case, with orthogonal projections $\T_i$ onto the eigenspaces $W_i=E_{\lambda_i}$,
 \[
 \T=\lambda_1\T_1+\cdots+\lambda_k\T_k,\qquad \I=\T_1+\cdots+\T_k,\qquad \T_i\T_j=\delta_{ij}\T_i,\qquad V=W_1\oplus\cdots\oplus W_k .
 \]
-\end{thmbox}
+\end{theorem}
 
 \begin{itemize}
   \item Eigenvalues of a self-adjoint operator are real; those of a unitary operator have absolute value $1$.
@@ -438,6 +447,8 @@ In either case, with orthogonal projections $\T_i$ onto the eigenspaces $W_i=E_{
   \item A real symmetric matrix is orthogonally diagonalizable: $A=QDQ^{t}$ with $Q$ orthogonal and $D$ real diagonal.
 \end{itemize}
 
+%----------------------------------------------------------
+% Subsection: Positive operators and quadratic forms
 \subsection{Positive operators and quadratic forms}
 $\T$ is \emph{positive semidefinite} if $\T=\T^*$ and $\ip{\T x}{x}\ge0$ for all $x$, and \emph{positive definite} if moreover
 $\ip{\T x}{x}>0$ for $x\neq0$; equivalently, $\T$ is self-adjoint with nonnegative (positive) eigenvalues. Every positive
@@ -445,10 +456,11 @@ semidefinite $\T$ has a unique positive semidefinite square root, and $A^*A$ is 
 A real quadratic form $q(x)=x^tAx$ with $A$ symmetric is positive definite iff all eigenvalues of $A$ are positive; by
 Sylvester's law of inertia, the numbers of positive, negative, and zero eigenvalues are invariants under congruence $A\mapsto Q^tAQ$.
 
-% =================================================================
+%----------------------------------------------------------
+% Section: The Singular Value Decomposition
 \section{The Singular Value Decomposition}
 
-\begin{thmbox}[: SVD]
+\begin{theorem}[SVD]
 Let $A\in\M_{m\times n}(\F)$ have rank $r$. There are unitary (orthogonal) $U\in\M_{m\times m}$, $V\in\M_{n\times n}$ and
 $\Sigma\in\M_{m\times n}$ with $\Sigma_{ii}=\sigma_i$ for $i\le r$ and all other entries zero, such that
 \[
@@ -456,7 +468,7 @@ A=U\Sigma V^*,\qquad \sigma_1\ge\sigma_2\ge\cdots\ge\sigma_r>0 .
 \]
 The \emph{singular values} $\sigma_i$ are the square roots of the nonzero eigenvalues of $A^*A$; the columns of $V$ (right singular vectors)
 are an orthonormal eigenbasis of $A^*A$, and $u_i=\sigma_i^{-1}Av_i$ for $i\le r$.
-\end{thmbox}
+\end{theorem}
 
 \begin{itemize}
   \item Geometrically, $L_A$ maps the unit sphere to an ellipsoid with semi-axes $\sigma_iu_i$: rotate ($V^*$), stretch ($\Sigma$), rotate ($U$).
@@ -466,28 +478,28 @@ are an orthonormal eigenbasis of $A^*A$, and $u_i=\sigma_i^{-1}Av_i$ for $i\le r
   \item \emph{Polar decomposition}: every square $A$ factors as $A=WP$ with $W$ unitary and $P=(A^*A)^{1/2}$ positive semidefinite.
 \end{itemize}
 
-% =================================================================
+%----------------------------------------------------------
+% Section: Quick Reference
 \section{Quick Reference}
 
-\begin{tabularx}{\linewidth}{@{}>{\scshape\color{burgundy}}p{0.27\linewidth}X@{}}
-\toprule
-Dimension theorem & $\nullity\T+\rank\T=\dim V$ \\
-Matrix of a map & column $j$ of $[\T]_\beta^\gamma$ is $[\T v_j]_\gamma$ \\
-Change of basis & $[\T]_{\beta'}=Q^{-1}[\T]_\beta Q$, \ $Q=[\I]_{\beta'}^\beta$ \\
-Determinant & multilinear, alternating, $\det I=1$; \ $\det(AB)=\det A\det B$ \\
-Diagonalizable & $f$ splits and geometric $=$ algebraic multiplicity; \ $p$ has distinct roots \\
-Cayley–Hamilton & $f(\T)=0$; \ $p\mid f$ \\
-Jordan form & $V=\bigoplus K_\lambda$; \ \#blocks for $\lambda=\dim E_\lambda$ \\
-Gram–Schmidt & $v_k=w_k-\sum_{j<k}\frac{\ip{w_k}{v_j}}{\norm{v_j}^2}v_j$ \\
-Projection & $\operatorname{proj}_W y=\sum\ip{y}{v_i}v_i$ for orthonormal $\{v_i\}$ \\
-Least squares & $A^*Ax=A^*y$ \\
-Adjoint & $\ip{\T x}{y}=\ip{x}{\T^*y}$, \ $[\T^*]_\beta=[\T]_\beta^*$ ($\beta$ orthonormal) \\
-Spectral theorem & normal ($\C$) / self-adjoint ($\R$) $\iff$ orthonormal eigenbasis \\
-SVD & $A=U\Sigma V^*$, \ $\sigma_i=\sqrt{\lambda_i(A^*A)}$ \\
-\bottomrule
+\begin{tabularx}{\linewidth}{|p{0.27\linewidth}|X|}
+\hline
+Dimension theorem & $\nullity\T+\rank\T=\dim V$ \\ \hline
+Matrix of a map & column $j$ of $[\T]_\beta^\gamma$ is $[\T v_j]_\gamma$ \\ \hline
+Change of basis & $[\T]_{\beta'}=Q^{-1}[\T]_\beta Q$, \ $Q=[\I]_{\beta'}^\beta$ \\ \hline
+Determinant & multilinear, alternating, $\det I=1$; \ $\det(AB)=\det A\det B$ \\ \hline
+Diagonalizable & $f$ splits and geometric $=$ algebraic multiplicity; \ $p$ has distinct roots \\ \hline
+Cayley–Hamilton & $f(\T)=0$; \ $p\mid f$ \\ \hline
+Jordan form & $V=\bigoplus K_\lambda$; \ \#blocks for $\lambda=\dim E_\lambda$ \\ \hline
+Gram–Schmidt & $v_k=w_k-\sum_{j<k}\frac{\ip{w_k}{v_j}}{\norm{v_j}^2}v_j$ \\ \hline
+Projection & $\operatorname{proj}_W y=\sum\ip{y}{v_i}v_i$ for orthonormal $\{v_i\}$ \\ \hline
+Least squares & $A^*Ax=A^*y$ \\ \hline
+Adjoint & $\ip{\T x}{y}=\ip{x}{\T^*y}$, \ $[\T^*]_\beta=[\T]_\beta^*$ ($\beta$ orthonormal) \\ \hline
+Spectral theorem & normal ($\C$) / self-adjoint ($\R$) $\iff$ orthonormal eigenbasis \\ \hline
+SVD & $A=U\Sigma V^*$, \ $\sigma_i=\sqrt{\lambda_i(A^*A)}$ \\ \hline
 \end{tabularx}
 
 \vfill
-{\small\color{muted}\textit{Reference:} S.\,H.~Friedberg, A.\,J.~Insel, L.\,E.~Spence, \textit{Linear Algebra}, 5th ed., Pearson, 2018.}
+{\small\textit{Reference:} S.\,H.~Friedberg, A.\,J.~Insel, L.\,E.~Spence, \textit{Linear Algebra}, 5th ed., Pearson, 2018.}
 
 \end{document}
