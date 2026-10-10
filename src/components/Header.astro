@@ -161,7 +161,8 @@ const isActive = (href: string) =>
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0.2rem 1.1rem;
+    /* Nine tabs plus the toggle must fit the 40rem measure on one line. */
+    gap: 0.2rem 0.75rem;
   }
   @media (max-width: 34rem) {
     header {
@@ -179,7 +180,7 @@ const isActive = (href: string) =>
     color: var(--muted);
     text-decoration: none;
     font-variant: small-caps;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
   }
   nav {
     align-items: baseline;
