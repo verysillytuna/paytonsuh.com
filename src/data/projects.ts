@@ -7,12 +7,41 @@ export type Project = {
   description: string;
   /** Distinct roles held over the project's life, newest first. */
   roles?: { title: string; period: string; description: string }[];
+  /** Parallel lines of work inside one project. */
+  threads?: { title: string; area: string; description: string }[];
   /** A dedicated page on this site with more detail. */
   page?: string;
   links?: { label: string; href: string }[];
 };
 
 export const projects: Project[] = [
+  {
+    title: 'BruinML',
+    area: 'Mathematics · Machine Learning',
+    status: 'ongoing',
+    period: '2026–',
+    description:
+      'Researcher at BruinML, working on three problems where geometry and analysis meet learning systems.',
+    threads: [
+      {
+        title: 'Cauchy–Pompeiu Bounds on Near-Holomorphic Neural Networks',
+        area: 'Complex Analysis',
+        description:
+          'The Cauchy–Pompeiu formula writes a smooth function on a domain in terms of its boundary values and its ∂̄-derivative, so it measures how far the function is from holomorphic. This project uses it to bound networks that are close to, but not exactly, holomorphic.',
+      },
+      {
+        title: 'Mean Curvature Flow of Lie Subgroups',
+        area: 'Geometric Analysis',
+        description:
+          'Mean curvature flow moves a submanifold in the direction of its mean curvature vector, so that it decreases its area as fast as possible. This project studies the flow when the submanifold is a Lie subgroup of a Lie group.',
+      },
+      {
+        title: 'Physical AI: Origami Robotics',
+        area: 'Robotics',
+        description: 'Learning and control for robots built from folded, origami-inspired structures.',
+      },
+    ],
+  },
   {
     title: 'ZrC-ARC: Zirconium Carbide Architected Refractory Coatings',
     area: 'Materials Science',
