@@ -38,6 +38,18 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
             ))}
           </ol>
         )}
+        {p.threads && (
+          <ul class="threads">
+            {p.threads.map((t) => (
+              <li>
+                <p class="thread">
+                  <strong>{t.title}</strong> <span class="muted smallcaps">· {t.area}</span>
+                </p>
+                <p>{t.description}</p>
+              </li>
+            ))}
+          </ul>
+        )}
         {p.page && (
           <p class="links">
             <a href={p.page}>{p.page.includes('light') ? 'Code, plots, and method →' : 'Read the project overview →'}</a>
@@ -114,6 +126,18 @@ const sorted = [...projects].sort((a, b) => order[a.status] - order[b.status]);
     background: var(--accent);
   }
   .roles p {
+    margin: 0 0 0.2rem;
+  }
+  .threads {
+    list-style: none;
+    margin: 0 0 1rem;
+    padding: 0 0 0 1rem;
+    border-left: 1px solid var(--rule);
+  }
+  .threads li {
+    margin-bottom: 0.75rem;
+  }
+  .threads p {
     margin: 0 0 0.2rem;
   }
   .rec {
