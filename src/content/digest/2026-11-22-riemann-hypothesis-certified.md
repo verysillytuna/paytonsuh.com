@@ -1,11 +1,11 @@
 ---
-title: "The Lean community certifies the Riemann hypothesis proof. What that certifies"
+title: "Lean's maintainers certify the Riemann hypothesis proof. What that certifies"
 date: 2026-11-22
-summary: "A day after Levent Alpöge released a 17-million-line Lean proof of the Riemann hypothesis, the Lean and Mathlib communities issued a joint statement certifying that the statement and the proof are correct. Here is what each of their four checks covers, and the one thing no check can give: an explanation."
+summary: "A day after Levent Alpöge released a 17-million-line Lean proof of the Riemann hypothesis, the Lean FRO and the Mathlib Initiative issued a joint statement certifying that the statement and the proof are correct. Here is what each of their four checks covers, and the one thing no check can give: an explanation."
 tags: [number theory, Riemann hypothesis, Lean, formalization]
 ---
 
-**TL;DR.** On November 21, 2026, the Lean and Mathlib communities published a [joint statement](https://leanprover-community.github.io/blog/posts/riemann-hypothesis/), endorsed by the Lean FRO and the Mathlib Initiative. It says they have "full confidence" that Levent Alpöge's Lean proof of the **Riemann hypothesis**, released the day before, is correct. The end-to-end statement comparison that was still running on November 21 has now finished, and two independent tools agree. Formally, this is about as strong a verdict as a proof can get. It still isn't understanding. Nobody has yet given a human account of why the 17-million-line argument works.
+**TL;DR.** On November 21, 2026, the Lean FRO and the Mathlib Initiative published a [joint statement](https://leanprover-community.github.io/blog/posts/riemann-hypothesis/). (It first appeared under the byline "Lean and Mathlib communities"; on November 23 the Mathlib maintainers changed it, to avoid attributing it to the communities as a whole.) It says they have "full confidence" that Levent Alpöge's Lean proof of the **Riemann hypothesis**, released the day before, is correct. The end-to-end statement comparison that was still running on November 21 has now finished, and two independent tools agree. Formally, this is about as strong a verdict as a proof can get. It still isn't understanding. Nobody has yet given a human account of why the 17-million-line argument works.
 
 ## The four checks
 
